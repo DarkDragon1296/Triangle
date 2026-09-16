@@ -1,8 +1,11 @@
 // TODO Код шейдеров поместить в отдельную директорию + прога по чтению кода
-// TODO Пофиксить баг с отображением треугольника ()
-// TODO добавить проверки на шейдеры
+// TODO Добавить проверки на шейдеры
+// TODO Возможность менять позицию камеры
+// TODO Управление камерой
+// TODO Вынести работу с vao, vbo и ebo в отдельный файл
 
 #include "../include/glad/glad.h"
+#include "../include/glm/glm.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "shader.hpp"
@@ -66,7 +69,20 @@ int main(void) {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-    
+   
+    // ^^^ Render ^^^
+
+    glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 camera_target = glm::vec3(0.0f, 0.0f, 0.0f);
+    glm::vec3 camera_direction = glm::normalize(camera_pos - camera_target);
+
+    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 camera_right = glm::normalize(glm::cross(up, camera_direction));
+
+    glm::vec3 camera_up = glm::cross(camera_direction, camera_right);
+
+    glm::mat4 view; 
+
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
 
