@@ -89,6 +89,10 @@ void set_bool(const std::string &name, bool value) const {
 void set_float(const std::string &name, float value) const {
     glUniform1i(glGetUniformLocation(id, name.c_str()), value);
 }
+void set_mat4(const std::string &name, glm::mat4 &mat) const {
+    glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &mat[0][0]);
+}
+
 };
 
 
