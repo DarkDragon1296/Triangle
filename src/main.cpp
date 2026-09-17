@@ -3,6 +3,7 @@
 // TODO Возможность менять позицию камеры
 // TODO Управление камерой
 // TODO Вынести работу с vao, vbo и ebo в отдельный файл
+// TODO относительные инклюды -- минимизировать
 
 #include "../include/glad/glad.h"
 #include "../include/glm/glm.hpp"
@@ -45,12 +46,14 @@ int main(void) {
         return -1;
     }
 
-    glViewport(0, 0, 800, 600);
+    shader our_shader("src/shaders/vertex_shader.vs",
+                      "src/shaders/fragment_shader.fs");
 
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+        /*    POSITION    */  /*     COLOR     */
+         0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,
+        -0.5f, -0.5f,  0.0f,  0.0f,  1.0f,  0.0f,
+         0.0f,  0.5f,  0.0f,  0.0f,  0.0f,  1.0f
     };
     unsigned int vbo, vao;
     
@@ -62,14 +65,12 @@ int main(void) {
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    unsigned int shader_program = create_shader();
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void *)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-   
+
     // ^^^ Render ^^^
 
     glm::vec3 camera_pos = glm::vec3(0.0f, 0.0f, 3.0f);
@@ -89,7 +90,7 @@ int main(void) {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader_program);
+        our_shader.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
 
@@ -97,6 +98,8 @@ int main(void) {
         glfwPollEvents();
     }
 
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
     glfwTerminate();
 
     return 0;
