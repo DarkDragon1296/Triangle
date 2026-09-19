@@ -1,3 +1,5 @@
+/* NO AI PROJECT */
+
 // TODO Добавить проверки на шейдеры
 // TODO Управление камерой
 // TODO относительные инклюды -- минимизировать
@@ -5,7 +7,7 @@
 // TODO фикс относительных путей директорий
 // TODO тесты на винде
 // TODO убрать варнинги для glm
-// TODO засунуть triangles в get_buffers
+// TODO написать README
 
 #include "../include/glad/glad.h"
 #include "../include/glm/ext.hpp"
@@ -17,37 +19,31 @@
 const char *vshader_path = "src/shaders/vertex_shader.vs";
 const char *fshader_path = "src/shaders/fragment_shader.fs";
 
-void process_input(GLFWwindow *window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-}
+void process_input(GLFWwindow *window);
 
 int main(void) {
     GLFWwindow *window = create_window();
-    struct triangle triangles[TRIANGLES_AMOUNT];
     unsigned int vbo, vao;
 
-    generate_triangle_test(triangles);
     shader our_shader(vshader_path, fshader_path);
-    get_buffers(vbo, vao, triangles, sizeof(triangles));
+    get_buffers(vbo, vao);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
-
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        clear_window();
 
         our_shader.use();
 
+        float radius = 30.0f;
+        float cam_x = static_cast<float>(sin(glfwGetTime()) * 1.25f * radius);
+        float cam_z = static_cast<float>(cos(glfwGetTime()) * radius);
+
+// start of create_transformations(camera) --> void
         glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                                 (float)WIDTH / (float)HEIGHT,
                                                  0.1f, 100.0f);
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view  = glm::mat4(1.0f);
-
-        float radius = 30.0f;
-        float cam_x = static_cast<float>(sin(glfwGetTime()) * 1.25f * radius);
-        float cam_z = static_cast<float>(cos(glfwGetTime()) * radius);
 
         model = glm::rotate(model,
                             glm::radians(0.0f),
@@ -62,6 +58,7 @@ int main(void) {
         glUniformMatrix4fv(view_loc, 1, GL_FALSE, &view[0][0]);
 
         our_shader.set_mat4("projection", projection);
+// end
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3 * TRIANGLES_AMOUNT);
@@ -70,9 +67,12 @@ int main(void) {
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glfwTerminate();
+    terminate_processes(vbo, vao);
 
     return 0;
+}
+
+void process_input(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }

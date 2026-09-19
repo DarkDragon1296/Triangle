@@ -24,8 +24,8 @@ struct triangle {
 GLFWwindow *create_window(void);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void generate_triangle_test(struct triangle *triangles);
-void get_buffers(unsigned int &vbo, unsigned int &vao,
-                 struct triangle *triangles,
-                 size_t triangles_size);
+void get_buffers(unsigned int &vbo, unsigned int &vao);
+void clear_window(void);
+void terminate_processes(unsigned int &vbo, unsigned int &vao);
 
 #endif
