@@ -20,9 +20,10 @@ ARTIFACT_PATH := build
 BINARY_PATH   := bin
 
 SOURCE_PATH   := src
+INCLUDE_PATH  := include
 
-INCLUDE_FLAGS := -I $(SOURCE_PATH)/
-LIBS          := -lm -lc -lglfw3 -lGL -lX11 -lpthread -lXrandr -lXi -ldl
+INCLUDE_FLAGS := -I $(SOURCE_PATH)/ -I $(INCLUDE_PATH)/
+LIBS          := -lm -lc -lglfw -lGL -lX11 -lpthread -lXrandr -lXi -ldl
 
 # Common defines
 DEFINE_FLAGS  :=

@@ -1,13 +1,14 @@
 /* NO AI PROJECT */
 
-// TODO Добавить проверки на шейдеры
-// TODO Управление камерой
-// TODO относительные инклюды -- минимизировать
-// TODO make run
-// TODO фикс относительных путей директорий
-// TODO тесты на винде
-// TODO убрать варнинги для glm
-// TODO написать README
+// TODO: Добавить проверки на шейдеры
+// TODO: Управление камерой
+// TODO: относительные инклюды -- минимизировать
+// TODO: make run
+// TODO: фикс относительных путей директорий
+// TODO: тесты на винде
+// TODO: убрать варнинги для glm
+// TODO: написать README
+// TODO: понять что не так с glfw3.lib
 
 #include "../include/glad/glad.h"
 #include "../include/glm/ext.hpp"
@@ -23,9 +24,9 @@ void process_input(GLFWwindow *window);
 
 int main(void) {
     GLFWwindow *window = create_window();
-    unsigned int vbo, vao;
+    unsigned int vbo = 0, vao = 0; //vbo -, vao -
 
-    shader our_shader(vshader_path, fshader_path);
+    shader our_shader = shader(vshader_path, fshader_path);
     get_buffers(vbo, vao);
 
     while (!glfwWindowShouldClose(window)) {
@@ -68,6 +69,9 @@ int main(void) {
     }
 
     terminate_processes(vbo, vao);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glfwTerminate();
 
     return 0;
 }
