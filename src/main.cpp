@@ -1,10 +1,11 @@
 // TODO Добавить проверки на шейдеры
-// TODO Возможность менять позицию камеры
 // TODO Управление камерой
-// TODO Вынести работу с vao, vbo и ebo в отдельный файл
 // TODO относительные инклюды -- минимизировать
 // TODO make run
 // TODO фикс относительных путей директорий
+// TODO тесты на винде
+// TODO убрать варнинги для glm
+// TODO засунуть triangles в get_buffers
 
 #include "../include/glad/glad.h"
 #include "../include/glm/ext.hpp"
@@ -23,46 +24,12 @@ void process_input(GLFWwindow *window) {
 
 int main(void) {
     GLFWwindow *window = create_window();
-    shader our_shader(vshader_path, fshader_path);
-
-    float vertices[] = {
-        /*    POSITION    */  /*     COLOR     */
-         0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,
-         0.0f,  0.5f,  0.0f,  1.0f,  1.0f,  1.0f,
-
-         0.5f, -0.5f,  1.0f,  1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  1.0f,  1.0f,  1.0f,  0.0f,
-         0.0f,  0.5f,  1.0f,  1.0f,  1.0f,  1.0f
-    };
-
+    struct triangle triangles[TRIANGLES_AMOUNT];
     unsigned int vbo, vao;
 
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
-
-    glBindVertexArray(vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3,
-                          GL_FLOAT, GL_FALSE,
-                          6 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
-
-    glVertexAttribPointer(1, 3,
-                          GL_FLOAT, GL_FALSE,
-                          6 * sizeof(float), (void *)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-
-    glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, 0.1f, 100.0f);
-    glm::mat4 proj = glm::perspective(glm::radians(45.0f),
-                                      (float)WIDTH/(float)HEIGHT,
-                                      0.1f, 100.0f);
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                            800.0f / 600.0f,
-                                            0.1f, 100.0f);
+    generate_triangle_test(triangles);
+    shader our_shader(vshader_path, fshader_path);
+    get_buffers(vbo, vao, triangles, sizeof(triangles));
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
@@ -72,10 +39,13 @@ int main(void) {
 
         our_shader.use();
 
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                                (float)WIDTH / (float)HEIGHT,
+                                                 0.1f, 100.0f);
         glm::mat4 model = glm::mat4(1.0f);
         glm::mat4 view  = glm::mat4(1.0f);
 
-        float radius = 3.0f;
+        float radius = 30.0f;
         float cam_x = static_cast<float>(sin(glfwGetTime()) * 1.25f * radius);
         float cam_z = static_cast<float>(cos(glfwGetTime()) * radius);
 
@@ -94,7 +64,7 @@ int main(void) {
         our_shader.set_mat4("projection", projection);
 
         glBindVertexArray(vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glDrawArrays(GL_TRIANGLES, 0, 3 * TRIANGLES_AMOUNT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
