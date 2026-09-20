@@ -1,6 +1,8 @@
 #ifndef RENDER_HPP
 #define RENDER_HPP
 
+#include "geometry.hpp"
+
 enum WindowProperties {
     HEIGHT = 600,
     WIDTH  = 800
@@ -15,10 +17,6 @@ enum TriangleTestProperties {
     OFFSET_2 = -10,
     DEG_ROTATION_1 = 45,
     DEG_ROTATION_2 = 90
-};
-
-struct triangle {
-    glm::vec3 dots[3];
 };
 
 GLFWwindow *create_window(void);

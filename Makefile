@@ -37,7 +37,7 @@ RELEASE_DEFINE_FLAGS := -D NDEBUG
 PROG_NAME     := triangles
 MAIN_TARGET   := $(BINARY_PATH)/$(PROG_NAME)
 # Source files (src/ is autoappended)
-RAW_SOURCES   := main.cpp glad.cpp render.cpp
+RAW_SOURCES   := main.cpp glad.cpp render.cpp geometry.cpp
 SOURCES       := $(patsubst %.cpp, $(SOURCE_PATH)/%.cpp, $(RAW_SOURCES))
 
 OBJECTS      := $(RAW_SOURCES:%.cpp=$(ARTIFACT_PATH)/%.o)

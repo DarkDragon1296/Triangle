@@ -14,6 +14,7 @@
 #include "../include/glm/ext.hpp"
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include "geometry.hpp"
 #include "shader.hpp"
 #include "render.hpp"
 
