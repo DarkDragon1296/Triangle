@@ -10,8 +10,8 @@
 // TODO: написать README
 // TODO: понять что не так с glfw3.lib
 
-#include "../include/glad/glad.h"
-#include "../include/glm/ext.hpp"
+#include "glad.h"
+#include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include "geometry.hpp"

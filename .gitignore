@@ -1,5 +1,3 @@
-bin/
 build/
 .cache/
-TODO.txt
 compile_commands.json

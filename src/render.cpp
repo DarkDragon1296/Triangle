@@ -1,5 +1,5 @@
-#include "../include/glad/glad.h"
-#include "../include/glm/ext.hpp"
+#include "glad.h"
+#include <glm/ext.hpp>
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include "render.hpp"
