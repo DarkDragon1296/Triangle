@@ -4,7 +4,7 @@
 #include <cmath>
 #include "geometry.hpp"
 
-int intersect_dim(struct triangle &tr1, struct triangle &tr2) {
+int get_intersection_dim(struct triangle &tr1, struct triangle &tr2) {
     glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
     glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
     glm::vec3 a_tr2 = tr2.dots[2] - tr2.dots[0];
@@ -17,7 +17,7 @@ int intersect_dim(struct triangle &tr1, struct triangle &tr2) {
 
     if (fabsf(cross_res) > 0.001f)
         return 1;
-
+// TODO: Проверить, не нужно ли делить на длины
     glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
                                        - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
 
@@ -28,4 +28,118 @@ int intersect_dim(struct triangle &tr1, struct triangle &tr2) {
         return 0;
 
     return 2;
+}
+
+void get_intersection_points(struct triangle &tr1, struct triangle &tr2,
+                             glm::vec3 *pts) {
+    int dim = get_intersection_dim(tr1, tr2);
+
+    if (dim == 1) {
+        glm::vec3 line_offset(0.0f), line_dir(0.0f);
+
+        get_line(tr1, tr2, line_offset, line_dir);
+
+        // переходим к новому базису
+        // ищем пересечения
+        // возвращаемся к старому базису
+    } else if (dim == 2) {
+        // получаем плоскость
+        // переходим к новому базису
+        // ищем пересечения
+        // возвращаемся к старому базису 
+    }
+}
+
+void get_line(struct triangle &tr1, struct triangle &tr2,
+              glm::vec3 &line_offset, glm::vec3 &line_dir) {
+    glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
+    glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
+    glm::vec4 b1 = glm::vec4(tr2.dots[1] - tr2.dots[0], 0.0f);
+    glm::vec4 b2 = glm::vec4(tr2.dots[2] - tr2.dots[0], 0.0f);
+
+    glm::mat4 sle(a1, a2, b1, b2);
+    glm::vec4 c  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
+
+    glm::vec4 sle_res = solve_sle4(sle, c);
+    
+}
+
+// TODO: Temp function
+void print_matrix(glm::mat4 m4, glm::vec4 b) {
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            std::cout << m4[j][i] << " ";
+        }
+        std::cout << "|  " << b[i] << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b) {
+    print_matrix(matrix, b);
+    for (int col = 0, row = 0; col < 4; col++) {
+        int max_row_index = find_max_abs_element_v4(matrix[col], row);
+        std::cout << max_row_index << std::endl;
+        std::cout << fabsf(matrix[col][max_row_index]) << std::endl;
+
+        if (fabsf(matrix[col][max_row_index]) < 0.001f) {
+            std::cout << "zero" << std::endl;
+            matrix[col] = glm::vec4(0.0f);
+        } else {
+            swap_rows_m4(matrix, row, max_row_index);
+            swap_elem_v4(b, row, max_row_index);
+            print_matrix(matrix, b);
+            simplify_rows_m4(matrix, b, row, col);
+
+            row++;
+        }
+
+        print_matrix(matrix, b);
+    }
+
+
+    return b;
+}
+
+int find_max_abs_element_v4(glm::vec4 v4, int start_index) {
+    int res = start_index;
+    for (int i = start_index; i < 4; i++) {
+        if (fabsf(v4[res]) < fabsf(v4[i]))
+            res = i;
+    }
+    return res;
+}
+
+// TODO: темплейты?
+void swap_rows_m4(glm::mat4 &m4, int i, int j) {
+    m4 = glm::transpose(m4);
+    glm::vec4 tmp_v4 = m4[i];
+    m4[i] = m4[j];
+    m4[j] = tmp_v4;
+    m4 = glm::transpose(m4);
+}
+
+void swap_elem_v4(glm::vec4 &v4, int i, int j) {
+    float tmp = v4[i];
+    v4[i] = v4[j];
+    v4[j] = tmp;
+}
+
+void simplify_rows_m4(glm::mat4 &m4, glm::vec4 &b, int main_row, int col) {
+    m4 = glm::transpose(m4);
+
+    for (int i = 3; i > main_row; i--) {
+        b[i]  -= (m4[i][col] / m4[main_row][col]) *  b[main_row];
+        m4[i] -= (m4[i][col] / m4[main_row][col]) * m4[main_row];
+    }
+
+    for (int i = 0; i < main_row; i++) {
+        b[i]  -= (m4[i][col] / m4[main_row][col]) *  b[main_row];
+        m4[i] -= (m4[i][col] / m4[main_row][col]) * m4[main_row];
+    }
+
+    b[main_row]  = (1.0f / m4[main_row][col]) *  b[main_row];
+    m4[main_row] = (1.0f / m4[main_row][col]) * m4[main_row];
+
+    m4 = glm::transpose(m4);
 }

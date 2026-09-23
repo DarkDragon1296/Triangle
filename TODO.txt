@@ -1,0 +1,26 @@
+include/glm/detail/qualifier.hpp:234:/* TODO: Duplicate ?
+
+include/glm/detail/compute_common.hpp:23:			// TODO, perf comp with: *(((int *) &x) + 1) &= 0x7fffffff;
+
+include/glm/gtx/matrix_decompose.inl:53:		/// TODO: Fixme!
+
+include/glm/simd/common.h:146:/* trunc TODO
+
+src/main.cpp:3:// TODO: Добавить проверки на шейдеры
+
+src/main.cpp:4:// TODO: Управление камерой
+
+src/main.cpp:5:// TODO: относительные инклюды -- минимизировать
+
+src/main.cpp:6:// TODO: make run
+
+src/main.cpp:7:// TODO: фикс относительных путей директорий
+
+src/main.cpp:8:// TODO: тесты на винде
+
+src/main.cpp:9:// TODO: убрать варнинги для glm
+
+src/main.cpp:10:// TODO: написать README
+
+src/main.cpp:11:// TODO: понять что не так с glfw3.lib
+
