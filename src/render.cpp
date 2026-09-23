@@ -3,7 +3,6 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 #include "render.hpp"
-#include "shader.hpp"
 
 GLFWwindow *create_window(void) {
     glfwInit();
@@ -36,7 +35,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void generate_triangle_test(struct triangle *triangles) {
+void generate_triangle_test(triangle *triangles) {
     float deg_angle[3];
     float rad_angle[3];
 
@@ -63,20 +62,24 @@ void generate_triangle_test(struct triangle *triangles) {
     }
 }
 
-void get_buffers(unsigned int &vbo, unsigned int &vao) {
-    struct triangle triangles[TRIANGLES_AMOUNT];
+vertex_objects get_buffers() {
+    vertex_objects vobjs = {0};
+
+    triangle triangles[TRIANGLES_AMOUNT];
     generate_triangle_test(triangles);
 
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    glGenVertexArrays(1, &vobjs.vao);
+    glBindVertexArray(vobjs.vao);
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glGenBuffers(1, &vobjs.vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
 
     glBufferData(GL_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
                           3 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
+
+    return vobjs;
 }
 
 void clear_window(void) {
@@ -84,8 +87,8 @@ void clear_window(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void terminate_processes(unsigned int &vbo, unsigned int &vao) {
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
+void terminate_processes(vertex_objects& vobjs) {
+    glDeleteVertexArrays(1, &vobjs.vao);
+    glDeleteBuffers(1, &vobjs.vbo);
     glfwTerminate();
 }

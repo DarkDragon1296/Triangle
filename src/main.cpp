@@ -12,8 +12,6 @@
 #include "glad.h"
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include "geometry.hpp"
 #include "shader.hpp"
 #include "render.hpp"
 
@@ -24,10 +22,9 @@ void process_input(GLFWwindow *window);
 
 int main(void) {
     GLFWwindow *window = create_window();
-    unsigned int vbo = 0, vao = 0; //vbo -, vao -
 
     shader our_shader = shader(vshader_path, fshader_path);
-    get_buffers(vbo, vao);
+    vertex_objects vobjs = get_buffers();
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
@@ -61,17 +58,14 @@ int main(void) {
         our_shader.set_mat4("projection", projection);
 // end
 
-        glBindVertexArray(vao);
+        glBindVertexArray(vobjs.vao);
         glDrawArrays(GL_TRIANGLES, 0, 3 * TRIANGLES_AMOUNT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    terminate_processes(vbo, vao);
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glfwTerminate();
+    terminate_processes(vobjs);
 
     return 0;
 }

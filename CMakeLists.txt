@@ -37,7 +37,7 @@ set(CMAKE_CXX_FLAGS
     "-Wall -Wextra -Weffc++                                    \
 		 -Waggressive-loop-optimizations                           \
 		 -Wc++14-compat -Wmissing-declarations -Wcast-align        \
-		 -Wcast-qual -Wchar-subscripts -Wconditionally-supported   \
+		 -Wcast-qual -Wchar-subscripts                             \
 		 -Wconversion -Wctor-dtor-privacy -Wempty-body             \
 		 -Wfloat-equal -Wformat-nonliteral -Wformat-security       \
 	   -Wformat-signedness -Wformat=2 -Winline -Wlogical-op      \

@@ -1,7 +1,8 @@
-#ifndef RENDER_HPP
-#define RENDER_HPP
+#pragma once
 
 #include "geometry.hpp"
+#include "types.h"
+#include <GLFW/glfw3.h>
 
 enum WindowProperties {
     HEIGHT = 600,
@@ -19,11 +20,14 @@ enum TriangleTestProperties {
     DEG_ROTATION_2 = 90
 };
 
+struct vertex_objects {
+  uint vbo = 0; // vertex buffer object - colors and position
+  uint vao = 0; // vertex array  object - states for the pipeline
+};
+
 GLFWwindow *create_window(void);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void generate_triangle_test(struct triangle *triangles);
-void get_buffers(unsigned int &vbo, unsigned int &vao);
+void generate_triangle_test(triangle *triangles);
+vertex_objects get_buffers();
 void clear_window(void);
-void terminate_processes(unsigned int &vbo, unsigned int &vao);
-
-#endif
+void terminate_processes(vertex_objects &vobjs);

@@ -4,7 +4,7 @@
 #include <cmath>
 #include "geometry.hpp"
 
-int get_intersection_dim(struct triangle &tr1, struct triangle &tr2) {
+int get_intersection_dim(triangle &tr1, triangle &tr2) {
     glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
     glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
     glm::vec3 a_tr2 = tr2.dots[2] - tr2.dots[0];
@@ -30,7 +30,7 @@ int get_intersection_dim(struct triangle &tr1, struct triangle &tr2) {
     return 2;
 }
 
-void get_intersection_points(struct triangle &tr1, struct triangle &tr2,
+void get_intersection_points(triangle &tr1, triangle &tr2,
                              glm::vec3 *pts) {
     int dim = get_intersection_dim(tr1, tr2);
 
@@ -53,7 +53,7 @@ void get_intersection_points(struct triangle &tr1, struct triangle &tr2,
 }
 
 // TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
-void get_line(struct triangle &tr1, struct triangle &tr2,
+void get_line(triangle &tr1, triangle &tr2,
               glm::vec3 &line_offset, glm::vec3 &line_dir) {
     glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
     glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
@@ -76,7 +76,7 @@ void get_line(struct triangle &tr1, struct triangle &tr2,
     line_dir = glm::normalize(glm::cross(n1, n2));
 }
 
-void get_plane(struct triangle &tr, glm::vec3 plane_offset,
+void get_plane(triangle &tr, glm::vec3 plane_offset,
                glm::vec3 dir1, glm::vec3 dir2) {
     plane_offset = tr.dots[0];
 

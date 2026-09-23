@@ -1,7 +1,7 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#pragma once
 
 #include "glad.h"
+#include "types.h"
 
 #include <string>
 #include <fstream>
@@ -10,7 +10,7 @@
 
 class shader {
 public:
-    unsigned int id;
+    uint id = 0;
 
     shader(const char *vertex_path, const char *fragment_path) {
         std::string vertex_code;
@@ -40,7 +40,7 @@ public:
         const char *vshader_code = vertex_code.c_str();
         const char *fshader_code = fragment_code.c_str();
 
-        unsigned int vertex, fragment;
+        uint vertex, fragment;
         int success;
         char info_log[512];
 
@@ -95,7 +95,7 @@ public:
         glUniform1i(glGetUniformLocation(id, name.c_str()), (int)value);
     }
     void set_float(const std::string &name, float value) const {
-        glUniform1i(glGetUniformLocation(id, name.c_str()), value);
+        glUniform1f(glGetUniformLocation(id, name.c_str()), value);
     }
     void set_mat4(const std::string &name, glm::mat4 &mat) const {
         glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1,
@@ -103,7 +103,5 @@ public:
     }
 };
 
-unsigned int create_shader(void);
-unsigned int get_shader(const int shader_type);
-
-#endif
+uint create_shader(void);
+uint get_shader(const int shader_type);
