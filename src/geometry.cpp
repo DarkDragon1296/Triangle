@@ -43,13 +43,16 @@ void get_intersection_points(struct triangle &tr1, struct triangle &tr2,
         // ищем пересечения
         // возвращаемся к старому базису
     } else if (dim == 2) {
-        // получаем плоскость
+        glm::vec3 plane_offset(0.0f), dir1(0.0f), dir2(0.0f);
+        get_plane(tr1, plane_offset, dir1, dir2);
+         
         // переходим к новому базису
         // ищем пересечения
         // возвращаемся к старому базису 
     }
 }
 
+// TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
 void get_line(struct triangle &tr1, struct triangle &tr2,
               glm::vec3 &line_offset, glm::vec3 &line_dir) {
     glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
@@ -61,44 +64,54 @@ void get_line(struct triangle &tr1, struct triangle &tr2,
     glm::vec4 c  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
 
     glm::vec4 sle_res = solve_sle4(sle, c);
-    
+
+    line_offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
+                              + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
+
+    glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
+                              tr1.dots[2] - tr1.dots[0]);
+    glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
+                              tr2.dots[2] - tr2.dots[0]);
+
+    line_dir = glm::normalize(glm::cross(n1, n2));
 }
 
-// TODO: Temp function
-void print_matrix(glm::mat4 m4, glm::vec4 b) {
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            std::cout << m4[j][i] << " ";
-        }
-        std::cout << "|  " << b[i] << std::endl;
-    }
-    std::cout << std::endl;
+void get_plane(struct triangle &tr, glm::vec3 plane_offset,
+               glm::vec3 dir1, glm::vec3 dir2) {
+    plane_offset = tr.dots[0];
+
+    dir1 = glm::normalize(tr.dots[1] - tr.dots[0]);
+    dir2 = tr.dots[1] - tr.dots[0];
+    dir2 = glm::normalize(dir2 - glm::dot(dir2, dir1) * dir1);
 }
 
 glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b) {
-    print_matrix(matrix, b);
     for (int col = 0, row = 0; col < 4; col++) {
         int max_row_index = find_max_abs_element_v4(matrix[col], row);
-        std::cout << max_row_index << std::endl;
-        std::cout << fabsf(matrix[col][max_row_index]) << std::endl;
 
         if (fabsf(matrix[col][max_row_index]) < 0.001f) {
-            std::cout << "zero" << std::endl;
             matrix[col] = glm::vec4(0.0f);
         } else {
             swap_rows_m4(matrix, row, max_row_index);
             swap_elem_v4(b, row, max_row_index);
-            print_matrix(matrix, b);
             simplify_rows_m4(matrix, b, row, col);
 
             row++;
         }
-
-        print_matrix(matrix, b);
     }
 
+    glm::vec4 res;
 
-    return b;
+    for (int i = 0, j = 0; i < 4; i++) {
+        if (fabsf(glm::length(matrix[i])) < 0.001f) {
+            res[i] = 0.0f;
+        } else {
+            res[i] = b[j];
+            j++;
+        }
+    }
+
+    return res;
 }
 
 int find_max_abs_element_v4(glm::vec4 v4, int start_index) {
@@ -110,7 +123,6 @@ int find_max_abs_element_v4(glm::vec4 v4, int start_index) {
     return res;
 }
 
-// TODO: темплейты?
 void swap_rows_m4(glm::mat4 &m4, int i, int j) {
     m4 = glm::transpose(m4);
     glm::vec4 tmp_v4 = m4[i];

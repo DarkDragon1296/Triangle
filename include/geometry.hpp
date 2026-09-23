@@ -9,8 +9,12 @@ struct triangle {
 
 int get_intersection_dim(struct triangle &tr1, struct triangle &tr2,
                          glm::vec3 *pts);
+void get_intersection_points(struct triangle &tr1, struct triangle &tr2,
+                             glm::vec3 *pts);
 void get_line(struct triangle &tr1, struct triangle &tr2,
               glm::vec3 &line_offset, glm::vec3 &line_dir);
+void get_plane(struct triangle &tr, glm::vec3 plane_offset,
+               glm::vec3 dir1, glm::vec3 dir2);
 glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b);
 int find_max_abs_element_v4(glm::vec4 v, int start_index);
 void swap_rows_m4(glm::mat4 &m4, int i, int j);

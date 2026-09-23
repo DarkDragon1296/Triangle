@@ -5,6 +5,9 @@
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
+// TODO: рассмотреть случай, если какой-нибудь нехороший человек передаст точки
+//       на одной прямой вместо треугольника
+// TODO: для линии и плоскости написать структуры
 
 #include "glad.h"
 #include <glm/ext.hpp>
@@ -25,20 +28,6 @@ int main(void) {
 
     shader our_shader = shader(vshader_path, fshader_path);
     get_buffers(vbo, vao);
-
-    glm::mat4 m = glm::mat4(
-        1.0f, 0.5f, 5.0f,  7.0f,
-        2.0f, 1.0f, 7.0f, 10.0f,
-        1.0f, 0.5f, 5.0f,  3.0f,
-        2.0f, 1.0f, 1.0f,  0.0f
-    );
-    m = glm::transpose(m);
-
-    glm::vec4 b = glm::vec4(
-        1.0f, 2.0f, 3.0f, 4.0f
-    );
-
-    solve_sle4(m, b);
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window);
