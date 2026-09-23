@@ -1,3 +1,12 @@
+# ----------------------------
+# How to use this build system:
+# If you are inside of the root directory of this project:
+#   cmake -B build
+#   cmake --build build
+# If you are already inside of a build directory:
+#   cmake -S ..
+#   cmake --build .
+# ----------------------------
 cmake_minimum_required(VERSION 3.10)
 
 # The project itself 
