@@ -12,7 +12,7 @@ cmake_minimum_required(VERSION 3.10)
 # The project itself 
 # (sets a bunch of platform things under the hood,
 #  hence why we call it first)
-project(triangles)
+project(triangles LANGUAGES CXX)
 
 # Policy that OpenGL asks for
 cmake_policy(SET CMP0072 NEW)
@@ -84,3 +84,4 @@ target_link_libraries(
     glm::glm
     glfw
 )
+
