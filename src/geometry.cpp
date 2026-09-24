@@ -35,10 +35,10 @@ void get_intersection_points(Triangle &tr1, Triangle &tr2,
   int dim = get_intersection_dim(tr1, tr2);
 
   if (dim == 1) {
-    glm::vec3 line_offset(0.0f), line_dir(0.0f);
+    Segment segment_1 = {0.0f, 0.0f};
+    Segment segment_2 = {0.0f, 0.0f};
 
-    get_line(tr1, tr2, line_offset, line_dir);
-
+    get_segments(tr1, tr2, segment_1, segment_2);
     // переходим к новому базису
     // ищем пересечения
     // возвращаемся к старому базису
@@ -52,9 +52,17 @@ void get_intersection_points(Triangle &tr1, Triangle &tr2,
   }
 }
 
+void get_segments(Triangle &tr1, Triangle &tr2,
+                  Segment &seg_1, Segment &seg_2) {
+  glm::vec3 line_offset(0.0f), line_dir(0.0f);
+
+  get_line(tr1, tr2, line_offset, line_dir);
+// собираем систему, и решаем ее
+// получаем отрезки
+}
 // TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
 void get_line(Triangle &tr1, Triangle &tr2,
-    glm::vec3 &line_offset, glm::vec3 &line_dir) {
+              glm::vec3 &line_offset, glm::vec3 &line_dir) {
   glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
   glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
   glm::vec4 b1 = glm::vec4(tr2.dots[1] - tr2.dots[0], 0.0f);
@@ -66,7 +74,7 @@ void get_line(Triangle &tr1, Triangle &tr2,
   glm::vec4 sle_res = solve_sle4(sle, c);
 
   line_offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
-                + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
+                            + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
 
   glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
                             tr1.dots[2] - tr1.dots[0]);
