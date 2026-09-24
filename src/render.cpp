@@ -1,4 +1,4 @@
-#include "glad.h"
+#include "glad.hpp"
 #include <glm/ext.hpp>
 #include <iostream>
 #include <GLFW/glfw3.h>

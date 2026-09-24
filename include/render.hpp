@@ -1,7 +1,7 @@
 #pragma once
 
 #include "geometry.hpp"
-#include "types.h"
+#include "types.hpp"
 
 #include <GLFW/glfw3.h>
 

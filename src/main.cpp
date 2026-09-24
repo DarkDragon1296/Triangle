@@ -9,7 +9,7 @@
 //       на одной прямой вместо треугольника
 // TODO: для линии и плоскости написать структуры
 
-#include "glad.h"
+#include "glad.hpp"
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include "shader.hpp"

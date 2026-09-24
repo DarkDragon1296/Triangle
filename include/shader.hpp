@@ -1,7 +1,7 @@
 #pragma once
 
-#include "glad.h"
-#include "types.h"
+#include "glad.hpp"
+#include "types.hpp"
 
 #include <glm/fwd.hpp>
 #include <glm/detail/type_mat4x4.hpp>
