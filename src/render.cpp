@@ -5,90 +5,90 @@
 #include "render.hpp"
 
 GLFWwindow *create_window(void) {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+  glfwInit();
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT,
-                                          "triangles",
-                                          NULL, NULL);
+  GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT,
+                                        "triangles",
+                                        NULL, NULL);
 
-    if (!window) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
+  if (!window) {
+    std::cout << "Failed to create GLFW window" << std::endl;
+    glfwTerminate();
+  }
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+  glfwMakeContextCurrent(window);
+  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-    }
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+    std::cout << "Failed to initialize GLAD" << std::endl;
+  }
 
-    glEnable(GL_DEPTH_TEST);
+  glEnable(GL_DEPTH_TEST);
 
-    return window;
+  return window;
 }
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-    glViewport(0, 0, width, height);
+  glViewport(0, 0, width, height);
 }
 
 void generate_triangle_test(Triangle *triangles) {
-    float deg_angle[3];
-    float rad_angle[3];
+  float deg_angle[3];
+  float rad_angle[3];
 
-    for (int i = 0; i < TRIANGLES_AMOUNT; i++) {
-        deg_angle[0] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_1; 
-        deg_angle[1] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_2; 
-        deg_angle[2] = (float)i / TRIANGLES_AMOUNT * 360.0f; 
+  for (int i = 0; i < TRIANGLES_AMOUNT; i++) {
+    deg_angle[0] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_1; 
+    deg_angle[1] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_2; 
+    deg_angle[2] = (float)i / TRIANGLES_AMOUNT * 360.0f; 
 
-        rad_angle[0] = glm::radians(deg_angle[0]); 
-        rad_angle[1] = glm::radians(deg_angle[1]); 
-        rad_angle[2] = glm::radians(deg_angle[2]); 
+    rad_angle[0] = glm::radians(deg_angle[0]); 
+    rad_angle[1] = glm::radians(deg_angle[1]); 
+    rad_angle[2] = glm::radians(deg_angle[2]); 
 
-        triangles[i].dots[0][0] = RADIUS_1 * glm::cos(rad_angle[0]);
-        triangles[i].dots[0][1] = RADIUS_1 * glm::sin(rad_angle[0]);
-        triangles[i].dots[0][2] = OFFSET_1;
+    triangles[i].dots[0][0] = RADIUS_1 * glm::cos(rad_angle[0]);
+    triangles[i].dots[0][1] = RADIUS_1 * glm::sin(rad_angle[0]);
+    triangles[i].dots[0][2] = OFFSET_1;
 
-        triangles[i].dots[1][0] = RADIUS_2 * glm::cos(rad_angle[1]);
-        triangles[i].dots[1][1] = RADIUS_2 * glm::sin(rad_angle[1]);
-        triangles[i].dots[1][2] = OFFSET_2;
+    triangles[i].dots[1][0] = RADIUS_2 * glm::cos(rad_angle[1]);
+    triangles[i].dots[1][1] = RADIUS_2 * glm::sin(rad_angle[1]);
+    triangles[i].dots[1][2] = OFFSET_2;
 
-        triangles[i].dots[2][0] = RADIUS_3 * glm::cos(rad_angle[2]);
-        triangles[i].dots[2][1] = RADIUS_3 * glm::sin(rad_angle[2]);
-        triangles[i].dots[2][2] = 0.0f;
-    }
+    triangles[i].dots[2][0] = RADIUS_3 * glm::cos(rad_angle[2]);
+    triangles[i].dots[2][1] = RADIUS_3 * glm::sin(rad_angle[2]);
+    triangles[i].dots[2][2] = 0.0f;
+  }
 }
 
-vertex_objects get_buffers() {
-    vertex_objects vobjs = {0};
+VertexInfo get_buffers() {
+  VertexInfo vobjs = {0};
 
-    Triangle triangles[TRIANGLES_AMOUNT];
-    generate_triangle_test(triangles);
+  Triangle triangles[TRIANGLES_AMOUNT];
+  generate_triangle_test(triangles);
 
-    glGenVertexArrays(1, &vobjs.vao);
-    glBindVertexArray(vobjs.vao);
+  glGenVertexArrays(1, &vobjs.vao);
+  glBindVertexArray(vobjs.vao);
 
-    glGenBuffers(1, &vobjs.vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
+  glGenBuffers(1, &vobjs.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                          3 * sizeof(float), (void *)0);
-    glEnableVertexAttribArray(0);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(triangles), triangles, GL_STATIC_DRAW);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                        3 * sizeof(float), NULL);
+  glEnableVertexAttribArray(0);
 
-    return vobjs;
+  return vobjs;
 }
 
 void clear_window(void) {
-    glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void terminate_processes(vertex_objects& vobjs) {
-    glDeleteVertexArrays(1, &vobjs.vao);
-    glDeleteBuffers(1, &vobjs.vbo);
-    glfwTerminate();
+void terminate_processes(VertexInfo& vobjs) {
+  glDeleteVertexArrays(1, &vobjs.vao);
+  glDeleteBuffers(1, &vobjs.vbo);
+  glfwTerminate();
 }

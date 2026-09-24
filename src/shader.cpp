@@ -12,22 +12,15 @@ Shader::Shader(const char *vertex_path, const char *fragment_path) {
 
   vshader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
   fshader_file.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-  try
-  {
-    vshader_file.open(vertex_path);
-    fshader_file.open(fragment_path);
-    std::stringstream vshader_stream, fshader_stream;
-    vshader_stream << vshader_file.rdbuf();
-    fshader_stream << fshader_file.rdbuf();
-    vshader_file.close();
-    fshader_file.close();
-    vertex_code   = vshader_stream.str();
-    fragment_code = fshader_stream.str();        
-  } catch(std::ifstream::failure& e) {
-    std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ"
-      << e.what()
-      << std::endl;
-  }
+  vshader_file.open(vertex_path);
+  fshader_file.open(fragment_path);
+  std::stringstream vshader_stream, fshader_stream;
+  vshader_stream << vshader_file.rdbuf();
+  fshader_stream << fshader_file.rdbuf();
+  vshader_file.close();
+  fshader_file.close();
+  vertex_code   = vshader_stream.str();
+  fragment_code = fshader_stream.str();
 
   const char *vshader_code = vertex_code.c_str();
   const char *fshader_code = fragment_code.c_str();
