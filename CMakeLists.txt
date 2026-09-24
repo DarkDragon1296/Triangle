@@ -73,7 +73,7 @@ target_sources(
 
   PRIVATE
     src/main.cpp src/render.cpp src/geometry.cpp
-    src/glad.cpp
+    src/glad.cpp src/shader.cpp
 )
 
 target_link_libraries(

@@ -11,7 +11,7 @@ GLFWwindow *create_window(void) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
     GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT,
-                                          "Triangles",
+                                          "triangles",
                                           NULL, NULL);
 
     if (!window) {
@@ -35,7 +35,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void generate_triangle_test(triangle *triangles) {
+void generate_triangle_test(Triangle *triangles) {
     float deg_angle[3];
     float rad_angle[3];
 
@@ -65,7 +65,7 @@ void generate_triangle_test(triangle *triangles) {
 vertex_objects get_buffers() {
     vertex_objects vobjs = {0};
 
-    triangle triangles[TRIANGLES_AMOUNT];
+    Triangle triangles[TRIANGLES_AMOUNT];
     generate_triangle_test(triangles);
 
     glGenVertexArrays(1, &vobjs.vao);

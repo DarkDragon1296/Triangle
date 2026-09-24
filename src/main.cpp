@@ -23,7 +23,7 @@ void process_input(GLFWwindow *window);
 int main(void) {
     GLFWwindow *window = create_window();
 
-    shader our_shader = shader(vshader_path, fshader_path);
+    Shader our_shader = Shader(vshader_path, fshader_path);
     vertex_objects vobjs = get_buffers();
 
     while (!glfwWindowShouldClose(window)) {

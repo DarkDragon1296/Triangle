@@ -2,22 +2,23 @@
 
 #include "geometry.hpp"
 #include "types.h"
+
 #include <GLFW/glfw3.h>
 
 enum WindowProperties {
-    HEIGHT = 600,
-    WIDTH  = 800
+  HEIGHT = 600,
+  WIDTH  = 800
 };
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 20,
-    RADIUS_1 = 9,
-    RADIUS_2 = 6,
-    RADIUS_3 = 3,
-    OFFSET_1 = 10,
-    OFFSET_2 = -10,
-    DEG_ROTATION_1 = 45,
-    DEG_ROTATION_2 = 90
+  TRIANGLES_AMOUNT = 20,
+  RADIUS_1 = 9,
+  RADIUS_2 = 6,
+  RADIUS_3 = 3,
+  OFFSET_1 = 10,
+  OFFSET_2 = -10,
+  DEG_ROTATION_1 = 45,
+  DEG_ROTATION_2 = 90
 };
 
 struct vertex_objects {
@@ -27,7 +28,7 @@ struct vertex_objects {
 
 GLFWwindow *create_window(void);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void generate_triangle_test(triangle *triangles);
+void generate_triangle_test(Triangle *triangles);
 vertex_objects get_buffers();
 void clear_window(void);
 void terminate_processes(vertex_objects &vobjs);
