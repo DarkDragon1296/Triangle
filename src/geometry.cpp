@@ -57,6 +57,15 @@ void get_segments(Triangle &tr1, Triangle &tr2,
   glm::vec3 line_offset(0.0f), line_dir(0.0f);
 
   get_line(tr1, tr2, line_offset, line_dir);
+/*
+  glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
+  glm::vec4 z1 = glm::vec4(0.0f);
+  glm::vec4 z2 = glm::vec4(0.0f);
+  glm::vec4 c = line_offset - tr1.dots[0];
+
+  glm::mat4 sle(a1, line_dir, z1, z2);
+  glm::vec4 sle_res = solve_sle4(sle, c);
+*/
 // собираем систему, и решаем ее
 // получаем отрезки
 }
