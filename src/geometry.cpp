@@ -52,22 +52,48 @@ void get_intersection_points(Triangle &tr1, Triangle &tr2,
   }
 }
 
-void get_segments(Triangle &tr1, Triangle &tr2,
+// TODO: Переделать функцию
+bool get_segments(Triangle &tr1, Triangle &tr2,
                   Segment &seg_1, Segment &seg_2) {
-  glm::vec3 line_offset(0.0f), line_dir(0.0f);
 
+  glm::vec3 line_offset(0.0f), line_dir(0.0f);
   get_line(tr1, tr2, line_offset, line_dir);
 
-  glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
-  glm::vec4 a2 = glm::vec4(line_dir, 0.0f);
+  int counter = 0;
   glm::vec4 z(0.0f);
-  glm::vec4 c = glm::vec4(line_offset - tr1.dots[0], 0.0f);
+  glm::mat4 sle(glm::vec4(line_dir, 0.0f), z, z, z);
 
-  glm::mat4 sle(a1, a2, z, z);
-  glm::vec4 sle_res = solve_sle4(sle, c);
+  for (int i = 0; i < 3; i++) {
+    sle[1] = glm::vec4(tr1.dots[(i + 1) % 3] - tr1.dots[i % 3], 0.0f);
+    glm::vec4 c = glm::vec4(line_offset - tr1.dots[i % 3], 0.0f);
+    glm::vec4 sle_res = solve_sle4(sle, c);
 
-// собираем систему, и решаем ее
-// получаем отрезки
+    if (fabsf(sle_res[1]) < 1.0f) {
+      seg_1.p[counter] = sle_res[0];
+      counter++;
+    }
+  }
+
+  if (counter < 2)
+    return false;
+
+  counter = 0;
+
+  for (int i = 0; i < 3; i++) {
+    sle[1] = glm::vec4(tr2.dots[(i + 1) % 3] - tr2.dots[i % 3], 0.0f);
+    glm::vec4 c = glm::vec4(line_offset - tr2.dots[i % 3], 0.0f);
+    glm::vec4 sle_res = solve_sle4(sle, c);
+
+    if (fabsf(sle_res[1]) < 1.0f) {
+      seg_2.p[counter] = sle_res[0];
+      counter++;
+    }
+  }
+
+  if (counter < 2)
+    return false;
+
+  return true;
 }
 // TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
 void get_line(Triangle &tr1, Triangle &tr2,

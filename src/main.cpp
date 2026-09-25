@@ -22,7 +22,6 @@ const char *fshader_path = "src/shaders/fragment_shader.fs";
 void process_input(GLFWwindow *window);
 
 int main(void) {
-
   GLFWwindow *window = create_window();
 
   Shader our_shader = Shader(vshader_path, fshader_path);
