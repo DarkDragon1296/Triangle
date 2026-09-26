@@ -31,6 +31,3 @@ class Shader {
                        GL_FALSE, &mat[0][0]);
   }
 };
-
-//uint create_shader(void);
-//uint get_shader(const int shader_type);

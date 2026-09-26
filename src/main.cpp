@@ -14,6 +14,7 @@
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 const char *vshader_path = "src/shaders/vertex_shader.vs";
 const char *fshader_path = "src/shaders/fragment_shader.fs";
@@ -24,7 +25,34 @@ int main(void) {
   GLFWwindow *window = create_window();
 
   Shader our_shader = Shader(vshader_path, fshader_path);
-  VertexInfo vobjs = get_buffers();
+
+  RenderObjects objs{};
+
+  Triangle tr1 = {{
+    {0.0f, 0.0f, 0.0f},
+    {2.0f, 2.0f, 0.0f},
+    {0.0f, 2.0f, 0.0f}
+  }};
+
+  Triangle tr2 = {{
+    {0.0f, 0.0f,  1.0f},
+    {2.0f, 2.0f,  0.0f},
+    {0.0f, 2.0f, -1.0f}
+  }};
+
+  objs.triangles.push_back(tr1);
+  objs.triangles.push_back(tr2);
+
+  
+
+  get_intersection_points(tr1, tr2, objs);
+  VertexInfo vobjs_segments = get_buffers(SEGMENT, objs.segments.size()
+                                          * sizeof(Segment3D),
+                                          objs.segments.data());
+
+  VertexInfo vobjs_triangles = get_buffers(TRIANGLE, objs.triangles.size()
+                                           * sizeof(Triangle),
+                                           objs.triangles.data());
 
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
@@ -32,7 +60,7 @@ int main(void) {
 
     our_shader.use();
 
-    float radius = 30.0f;
+    float radius = 10.0f;
     float cam_x = static_cast<float>(sin(glfwGetTime()) * 1.25f * radius);
     float cam_z = static_cast<float>(cos(glfwGetTime()) * radius);
 
@@ -57,14 +85,20 @@ int main(void) {
     our_shader.set_mat4("projection", projection);
     // end
 
-    glBindVertexArray(vobjs.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * TRIANGLES_AMOUNT);
+    glUniform1i(glGetUniformLocation(our_shader.id, "isIntersection"), true);
+    glBindVertexArray(vobjs_segments.vao);
+    glDrawArrays(GL_LINES, 0, 2 * objs.segments.size());
+
+    glUniform1i(glGetUniformLocation(our_shader.id, "isIntersection"), false);
+    glBindVertexArray(vobjs_triangles.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3 * objs.triangles.size());
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-  terminate_processes(vobjs);
+//  terminate_processes(vobjs);
+  terminate_processes(vobjs_segments);
 
   return 0;
 }

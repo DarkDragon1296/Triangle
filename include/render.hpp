@@ -22,13 +22,13 @@ enum TriangleTestProperties {
 };
 
 struct VertexInfo {
-  uint vbo = 0; // vertex buffer object - colors and position
-  uint vao = 0; // vertex array  object - states for the pipeline
+  uint vbo = 0;
+  uint vao = 0;
 };
 
 GLFWwindow *create_window(void);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void generate_triangle_test(Triangle *triangles);
-VertexInfo get_buffers();
+VertexInfo get_buffers(int dots_amount, size_t size, const void *data);
 void clear_window(void);
 void terminate_processes(VertexInfo &vobjs);

@@ -1,7 +1,13 @@
 #version 330 core
 out vec4 FragColor;
- 
+
+uniform bool isIntersection;
+
 void main()
 {
-    FragColor = vec4(0.9, 0.9, 0.0, 1.0);
+    if (isIntersection) {
+        FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    } else {
+        FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    }
 }

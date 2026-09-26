@@ -4,31 +4,15 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
-void get_intersection_points(Triangle tr1, Triangle tr2, glm::vec3 *pts) {
+void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
   int dim = get_intersection_dim(tr1, tr2);
 
   if (dim == 1) {
-    Segment1D segment_1 = {0.0f, 0.0f};
-    Segment1D segment_2 = {0.0f, 0.0f};
-    Segment1D seg       = {0.0f, 0.0f};
-    bool is_exist = get_segments(tr1, tr2, segment_1, segment_2);
+    Segment3D segment = get_3d_segment(tr1, tr2);
+    objs.segments.push_back(segment);
 
-    if (is_exist) {
-      get_intersection_segment(segment_1, segment_2, seg);
-
-
-    }
-
-    // переходим к новому базису
-    // ищем пересечения
-    // возвращаемся к старому базису
   } else if (dim == 2) {
-    glm::vec3 plane_offset(0.0f), dir1(0.0f), dir2(0.0f);
-    get_plane(tr1, plane_offset, dir1, dir2);
-
-    // переходим к новому базису
-    // ищем пересечения
-    // возвращаемся к старому базису 
+    /* TODO: */
   }
 }
 
@@ -61,59 +45,20 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
   return 2;
 }
 
-// TODO: Переделать функцию
-bool get_segments(Triangle tr1, Triangle tr2,
-                  Segment1D &seg1, Segment1D &seg2) {
+Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
+  Segment1D seg1{}, seg2{}, seg_1d_res{};
+  Line line{};
 
-  glm::vec3 line_offset(0.0f), line_dir(0.0f);
-  get_line(tr1, tr2, line_offset, line_dir);
+  get_line(tr1, tr2, line);
+  get_1d_segment(tr1, line, seg1);
+  get_1d_segment(tr2, line, seg2);
+  get_1d_intersection_segment(seg1, seg2, seg_1d_res);
+  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 
-  int counter = 0; // TODO: поменять название
-  glm::vec4 z(0.0f);
-  glm::mat4 sle(glm::vec4(line_dir, 0.0f), z, z, z);
-
-  for (int i = 0; i < 3; i++) {
-    sle[1] = glm::vec4(tr1.dots[(i + 1) % 3] - tr1.dots[i % 3], 0.0f);
-    glm::vec4 c = glm::vec4(line_offset - tr1.dots[i % 3], 0.0f);
-    glm::vec4 sle_res = solve_sle4(sle, c);
-
-    if (fabsf(sle_res[1]) < 1.0f) {
-      seg1.p[counter] = sle_res[0];
-      counter++;
-    }
-  }
-
-  if (counter < 2)
-    return false;
-
-  counter = 0;
-
-  for (int i = 0; i < 3; i++) {
-    sle[1] = glm::vec4(tr2.dots[(i + 1) % 3] - tr2.dots[i % 3], 0.0f);
-    glm::vec4 c = glm::vec4(line_offset - tr2.dots[i % 3], 0.0f);
-    glm::vec4 sle_res = solve_sle4(sle, c);
-
-    if (fabsf(sle_res[1]) < 1.0f) {
-      seg2.p[counter] = sle_res[0];
-      counter++;
-    }
-  }
-
-  if (counter < 2)
-    return false;
-
-  return true;
+  return seg_3d;
 }
 
-void get_intersection_segment(Segment1D seg1,
-                              Segment1D seg2,
-                              Segment1D &seg_res) {
-
-}
-
-// TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
-void get_line(Triangle tr1, Triangle tr2,
-              glm::vec3 &line_offset, glm::vec3 &line_dir) {
+void get_line(Triangle tr1, Triangle tr2, Line &line) {
   glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
   glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
   glm::vec4 b1 = glm::vec4(tr2.dots[1] - tr2.dots[0], 0.0f);
@@ -124,7 +69,7 @@ void get_line(Triangle tr1, Triangle tr2,
 
   glm::vec4 sle_res = solve_sle4(sle, c);
 
-  line_offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
+  line.offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
                             + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
 
   glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
@@ -132,7 +77,54 @@ void get_line(Triangle tr1, Triangle tr2,
   glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
                             tr2.dots[2] - tr2.dots[0]);
 
-  line_dir = glm::normalize(glm::cross(n1, n2));
+  line.e = glm::normalize(glm::cross(n1, n2));
+}
+
+bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
+  glm::vec4 z(0.0f);
+  glm::mat4 sle(glm::vec4(line.e, 0.0f), z, z, z);
+  int segment_counter = 0;
+
+  for (int i = 0; i < 3; i++) {
+    sle[1] = glm::vec4(tr.dots[(i + 1) % 3] - tr.dots[i % 3], 0.0f);
+
+    glm::vec4 c = glm::vec4(line.offset - tr.dots[i % 3], 0.0f);
+    glm::vec4 sle_res = solve_sle4(sle, c);
+
+    if (fabsf(sle_res[1]) < 1.0f) {
+      seg.dots[segment_counter] = sle_res[0];
+      segment_counter++;
+    }
+  }
+
+  if (segment_counter < 2)
+    return false;
+
+  return true;
+}
+
+bool get_1d_intersection_segment(Segment1D seg1,
+                                Segment1D seg2,
+                                Segment1D &seg_res) {
+  sort_segment_points(seg1);
+  sort_segment_points(seg2);
+
+  if (seg1.dots[1] < seg2.dots[0] || seg2.dots[1] < seg1.dots[1])
+    return false;
+
+  seg_res.dots[0] = seg1.dots[0] > seg2.dots[0] ? seg1.dots[0] : seg2.dots[0];
+  seg_res.dots[1] = seg1.dots[1] < seg2.dots[1] ? seg1.dots[1] : seg2.dots[1];
+
+  return true;
+}
+
+Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d) {
+  Segment3D seg_3d{};
+
+  seg_3d.dots[0] = line.offset + seg_1d.dots[0] * line.e;
+  seg_3d.dots[1] = line.offset + seg_1d.dots[1] * line.e;
+
+  return seg_3d;
 }
 
 void get_plane(Triangle tr, glm::vec3 &plane_offset,
@@ -214,4 +206,12 @@ void simplify_rows_m4(glm::mat4 &m4, glm::vec4 &b, int main_row, int col) {
   m4[main_row] = (1.0f / m4[main_row][col]) * m4[main_row];
 
   m4 = glm::transpose(m4);
+}
+
+void sort_segment_points(Segment1D &seg) {
+  if (seg.dots[0] > seg.dots[1]) {
+    float tmp = seg.dots[0];
+    seg.dots[0] = seg.dots[1];
+    seg.dots[1] = tmp;
+  }
 }
