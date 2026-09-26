@@ -4,41 +4,21 @@
 #include <GLFW/glfw3.h>
 #include <cmath>
 
-int get_intersection_dim(Triangle &tr1, Triangle &tr2) {
-  glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
-  glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
-  glm::vec3 a_tr2 = tr2.dots[2] - tr2.dots[0];
-  glm::vec3 b_tr2 = tr2.dots[2] - tr2.dots[1];
-
-  glm::vec3 n_tr1 = glm::cross(a_tr1, b_tr1);
-  glm::vec3 n_tr2 = glm::cross(a_tr2, b_tr2);
-
-  float cross_res = glm::length(glm::cross(n_tr1, n_tr2));
-
-  if (fabsf(cross_res) > 0.001f)
-    return 1;
-  // TODO: Проверить, не нужно ли делить на длины
-  glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
-                         - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
-
-  glm::vec3 pl2_offset = tr2.dots[0] - glm::dot(tr2.dots[0], a_tr2) * a_tr2
-                         - glm::dot(tr2.dots[0], b_tr2) * b_tr2;
-
-  if (fabsf(glm::length(pl1_offset - pl2_offset)) > 0.001f)
-    return 0;
-
-  return 2;
-}
-
-void get_intersection_points(Triangle &tr1, Triangle &tr2,
-                             glm::vec3 *pts) {
+void get_intersection_points(Triangle tr1, Triangle tr2, glm::vec3 *pts) {
   int dim = get_intersection_dim(tr1, tr2);
 
   if (dim == 1) {
-    Segment segment_1 = {0.0f, 0.0f};
-    Segment segment_2 = {0.0f, 0.0f};
+    Segment1D segment_1 = {0.0f, 0.0f};
+    Segment1D segment_2 = {0.0f, 0.0f};
+    Segment1D seg       = {0.0f, 0.0f};
+    bool is_exist = get_segments(tr1, tr2, segment_1, segment_2);
 
-    get_segments(tr1, tr2, segment_1, segment_2);
+    if (is_exist) {
+      get_intersection_segment(segment_1, segment_2, seg);
+
+
+    }
+
     // переходим к новому базису
     // ищем пересечения
     // возвращаемся к старому базису
@@ -52,14 +32,43 @@ void get_intersection_points(Triangle &tr1, Triangle &tr2,
   }
 }
 
+int get_intersection_dim(Triangle tr1, Triangle tr2) {
+  glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
+  glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
+  glm::vec3 a_tr2 = tr2.dots[2] - tr2.dots[0];
+  glm::vec3 b_tr2 = tr2.dots[2] - tr2.dots[1];
+
+  glm::vec3 n_tr1 = glm::cross(a_tr1, b_tr1);
+  glm::vec3 n_tr2 = glm::cross(a_tr2, b_tr2);
+
+  float cross_res = glm::length(glm::cross(n_tr1, n_tr2));
+
+  if (fabsf(cross_res) > 0.001f)
+    return 1;
+
+  glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
+                                     - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
+
+  glm::vec3 pl2_offset = tr2.dots[0] - glm::dot(tr2.dots[0], a_tr2) * a_tr2
+                                     - glm::dot(tr2.dots[0], b_tr2) * b_tr2;
+
+  pl1_offset = glm::normalize(pl1_offset);
+  pl2_offset = glm::normalize(pl2_offset);
+
+  if (fabsf(glm::length(pl1_offset - pl2_offset)) > 0.001f)
+    return 0;
+
+  return 2;
+}
+
 // TODO: Переделать функцию
-bool get_segments(Triangle &tr1, Triangle &tr2,
-                  Segment &seg_1, Segment &seg_2) {
+bool get_segments(Triangle tr1, Triangle tr2,
+                  Segment1D &seg1, Segment1D &seg2) {
 
   glm::vec3 line_offset(0.0f), line_dir(0.0f);
   get_line(tr1, tr2, line_offset, line_dir);
 
-  int counter = 0;
+  int counter = 0; // TODO: поменять название
   glm::vec4 z(0.0f);
   glm::mat4 sle(glm::vec4(line_dir, 0.0f), z, z, z);
 
@@ -69,7 +78,7 @@ bool get_segments(Triangle &tr1, Triangle &tr2,
     glm::vec4 sle_res = solve_sle4(sle, c);
 
     if (fabsf(sle_res[1]) < 1.0f) {
-      seg_1.p[counter] = sle_res[0];
+      seg1.p[counter] = sle_res[0];
       counter++;
     }
   }
@@ -85,7 +94,7 @@ bool get_segments(Triangle &tr1, Triangle &tr2,
     glm::vec4 sle_res = solve_sle4(sle, c);
 
     if (fabsf(sle_res[1]) < 1.0f) {
-      seg_2.p[counter] = sle_res[0];
+      seg2.p[counter] = sle_res[0];
       counter++;
     }
   }
@@ -95,8 +104,15 @@ bool get_segments(Triangle &tr1, Triangle &tr2,
 
   return true;
 }
+
+void get_intersection_segment(Segment1D seg1,
+                              Segment1D seg2,
+                              Segment1D &seg_res) {
+
+}
+
 // TODO: Эту функцию можно разделить на 2 части + сделать ее нормальнее
-void get_line(Triangle &tr1, Triangle &tr2,
+void get_line(Triangle tr1, Triangle tr2,
               glm::vec3 &line_offset, glm::vec3 &line_dir) {
   glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
   glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
@@ -119,8 +135,8 @@ void get_line(Triangle &tr1, Triangle &tr2,
   line_dir = glm::normalize(glm::cross(n1, n2));
 }
 
-void get_plane(Triangle &tr, glm::vec3 plane_offset,
-               glm::vec3 dir1, glm::vec3 dir2) {
+void get_plane(Triangle tr, glm::vec3 &plane_offset,
+               glm::vec3 &dir1, glm::vec3 &dir2) {
   plane_offset = tr.dots[0];
 
   dir1 = glm::normalize(tr.dots[1] - tr.dots[0]);
@@ -128,6 +144,7 @@ void get_plane(Triangle &tr, glm::vec3 plane_offset,
   dir2 = glm::normalize(dir2 - glm::dot(dir2, dir1) * dir1);
 }
 
+// TODO: Тут лучше адрес передавать для матрицы
 glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b) {
   for (int col = 0, row = 0; col < 4; col++) {
     int max_row_index = find_max_abs_element_v4(matrix[col], row);
