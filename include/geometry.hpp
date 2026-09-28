@@ -47,10 +47,6 @@ bool get_1d_intersection_segment(Segment1D seg1,
                                  Segment1D seg2,
                                  Segment1D &seg_res);
 Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
-
-
-
-
 void get_plane(Triangle tr, glm::vec3 &plane_offset,
                glm::vec3 &dir1, glm::vec3 &dir2);
 glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b);
@@ -59,3 +55,4 @@ void swap_rows_m4(glm::mat4 &m4, int i, int j);
 void swap_elem_v4(glm::vec4 &v4, int i, int j);
 void simplify_rows_m4(glm::mat4 &m4, glm::vec4 &b, int main_row, int col);
 void sort_segment_points(Segment1D &seg);
+void print_vec3(glm::vec3 v);

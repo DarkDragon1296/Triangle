@@ -3,9 +3,11 @@
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <cmath>
+#include <iostream> // TODO: del
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
   int dim = get_intersection_dim(tr1, tr2);
+  std::cout << "dim = " << dim << std::endl; // TODO: del
 
   if (dim == 1) {
     Segment3D segment = get_3d_segment(tr1, tr2);
@@ -50,8 +52,21 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Line line{};
 
   get_line(tr1, tr2, line);
-  get_1d_segment(tr1, line, seg1);
-  get_1d_segment(tr2, line, seg2);
+  std::cout << "line: offset = ";
+  print_vec3(line.offset);
+  std::cout << ", direction = ";
+  print_vec3(line.e);
+  std::cout << std::endl; // TODO: del
+
+  bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
+  bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
+
+  if (!is_seg1_exist)
+    std::cout << "seg1 isn't exist" << std::endl;
+
+  if (!is_seg2_exist)
+    std::cout << "seg2 isn't exist" << std::endl;
+
   get_1d_intersection_segment(seg1, seg2, seg_1d_res);
   Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 
@@ -76,7 +91,6 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
                             tr1.dots[2] - tr1.dots[0]);
   glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
                             tr2.dots[2] - tr2.dots[0]);
-
   line.e = glm::normalize(glm::cross(n1, n2));
 }
 
@@ -91,7 +105,10 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
     glm::vec4 c = glm::vec4(line.offset - tr.dots[i % 3], 0.0f);
     glm::vec4 sle_res = solve_sle4(sle, c);
 
-    if (fabsf(sle_res[1]) < 1.0f) {
+    // TODO: del
+    std::cout << "[" << sle_res[0] << ", " << sle_res[1] << "]" << std::endl;
+
+    if (fabsf(sle_res[1]) <= 1.0f && segment_counter < 2) {
       seg.dots[segment_counter] = sle_res[0];
       segment_counter++;
     }
@@ -214,4 +231,8 @@ void sort_segment_points(Segment1D &seg) {
     seg.dots[0] = seg.dots[1];
     seg.dots[1] = tmp;
   }
+}
+
+void print_vec3(glm::vec3 v) {
+  std::cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
 }

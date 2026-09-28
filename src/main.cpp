@@ -7,6 +7,11 @@
 // TODO: добавить константность параметров там, где необходимо
 // TODO: рассмотреть случай, если какой-нибудь нехороший человек передаст точки
 //       на одной прямой вместо треугольника
+// TODO: переписать solve_sle4 в функцию, принимающую std вектор из vec3, и
+//       возвращающий параметры линейной комбинации
+// TODO: пофиксить математику:
+//       1) line.offset находится с ошибкой
+
 
 #include "glad.hpp"
 #include "shader.hpp"
@@ -43,8 +48,6 @@ int main(void) {
   objs.triangles.push_back(tr1);
   objs.triangles.push_back(tr2);
 
-  
-
   get_intersection_points(tr1, tr2, objs);
   VertexInfo vobjs_segments = get_buffers(SEGMENT, objs.segments.size()
                                           * sizeof(Segment3D),
@@ -53,6 +56,10 @@ int main(void) {
   VertexInfo vobjs_triangles = get_buffers(TRIANGLE, objs.triangles.size()
                                            * sizeof(Triangle),
                                            objs.triangles.data());
+
+  std::cout << "segments: " << std::endl;
+  print_vec3(objs.segments[0].dots[0]);
+  print_vec3(objs.segments[0].dots[1]);
 
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
