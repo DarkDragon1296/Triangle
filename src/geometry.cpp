@@ -184,7 +184,7 @@ bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
   }
 
   for (int i = 0, j = 0; i < mat.size(); i++) {
-    if (fabsf(glm::length(matrix[i])) < 0.001f) {
+    if (fabsf(glm::length(mat[i])) < 0.001f) {
       res_coeff[i] = 0.0f;
     } else {
       res_coeff[i] = b[j];
@@ -220,26 +220,15 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j) {
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
                        int main_row, int col) {
   for (int i = 0; i < main_row; i++) {
-    
-
-
+    b[i]   -= (mat[i][col] / mat[main_row][col]) *  b[main_row];
+    mat[i] -= (mat[i][col] / mat[main_row][col]) * mat[main_row];
   }
 
-  /*  mat = glm::transpose(m3);
-
-  for (int i = 2; i > main_row; i--) {
-    b[i]  -= (m3[i][col] / m3[main_row][col]) *  b[main_row];
-    m3[i] -= (m3[i][col] / m3[main_row][col]) * m3[main_row];
+  for (int i = main_row + 1; i < mat.size(); i++) {
+    b[i]   -= (mat[i][col] / mat[main_row][col]) *  b[main_row];
+    mat[i] -= (mat[i][col] / mat[main_row][col]) * mat[main_row];
   }
 
-  for (int i = 0; i < main_row; i++) {
-    b[i]  -= (m3[i][col] / m3[main_row][col]) *  b[main_row];
-    m3[i] -= (m3[i][col] / m3[main_row][col]) * m3[main_row];
-  }
-
-  b[main_row]  = (1.0f / m3[main_row][col]) *  b[main_row];
-  m3[main_row] = (1.0f / m3[main_row][col]) * m3[main_row];
-
-  m3 = glm::transpose(m3);
-  */
+  b[main_row]   = (1.0f / mat[main_row][col]) *  b[main_row];
+  mat[main_row] = (1.0f / mat[main_row][col]) * mat[main_row];
 }
