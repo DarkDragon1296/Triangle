@@ -71,7 +71,7 @@ VertexInfo get_buffers(int dots_amount, size_t size, const void *data) {
   glGenBuffers(1, &vobjs.vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
 
-  glBufferData(GL_ARRAY_BUFFER, size, data, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)size, data, GL_STATIC_DRAW);
   glVertexAttribPointer(0, dots_amount, GL_FLOAT, GL_FALSE,
                         dots_amount * sizeof(float), NULL);
   glEnableVertexAttribArray(0);

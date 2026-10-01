@@ -12,7 +12,6 @@
 // TODO: пофиксить математику:
 //       1) line.offset находится с ошибкой
 
-
 #include "glad.hpp"
 #include "shader.hpp"
 #include "render.hpp"
@@ -94,11 +93,11 @@ int main(void) {
 
     glUniform1i(glGetUniformLocation(our_shader.id, "isIntersection"), true);
     glBindVertexArray(vobjs_segments.vao);
-    glDrawArrays(GL_LINES, 0, 2 * objs.segments.size());
+    glDrawArrays(GL_LINES, 0, 2 * (GLsizei)objs.segments.size());
 
     glUniform1i(glGetUniformLocation(our_shader.id, "isIntersection"), false);
     glBindVertexArray(vobjs_triangles.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * objs.triangles.size());
+    glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
 
     glfwSwapBuffers(window);
     glfwPollEvents();

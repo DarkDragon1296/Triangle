@@ -83,6 +83,9 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
   glm::vec4 c  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
 
   glm::vec4 sle_res = solve_sle4(sle, c);
+  std::cout << "sle res = ";
+  print_vec3(glm::vec3(sle_res));
+  std::cout << std::endl;
 
   line.offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
                             + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
@@ -153,78 +156,6 @@ void get_plane(Triangle tr, glm::vec3 &plane_offset,
   dir2 = glm::normalize(dir2 - glm::dot(dir2, dir1) * dir1);
 }
 
-// TODO: Тут лучше адрес передавать для матрицы
-glm::vec4 solve_sle4(glm::mat4 matrix, glm::vec4 b) {
-  for (int col = 0, row = 0; col < 4; col++) {
-    int max_row_index = find_max_abs_element_v4(matrix[col], row);
-
-    if (fabsf(matrix[col][max_row_index]) < 0.001f) {
-      matrix[col] = glm::vec4(0.0f);
-    } else {
-      swap_rows_m4(matrix, row, max_row_index);
-      swap_elem_v4(b, row, max_row_index);
-      simplify_rows_m4(matrix, b, row, col);
-
-      row++;
-    }
-  }
-
-  glm::vec4 res;
-
-  for (int i = 0, j = 0; i < 4; i++) {
-    if (fabsf(glm::length(matrix[i])) < 0.001f) {
-      res[i] = 0.0f;
-    } else {
-      res[i] = b[j];
-      j++;
-    }
-  }
-
-  return res;
-}
-
-int find_max_abs_element_v4(glm::vec4 v4, int start_index) {
-  int res = start_index;
-  for (int i = start_index; i < 4; i++) {
-    if (fabsf(v4[res]) < fabsf(v4[i]))
-      res = i;
-  }
-  return res;
-}
-
-void swap_rows_m4(glm::mat4 &m4, int i, int j) {
-  m4 = glm::transpose(m4);
-  glm::vec4 tmp_v4 = m4[i];
-  m4[i] = m4[j];
-  m4[j] = tmp_v4;
-  m4 = glm::transpose(m4);
-}
-
-void swap_elem_v4(glm::vec4 &v4, int i, int j) {
-  float tmp = v4[i];
-  v4[i] = v4[j];
-  v4[j] = tmp;
-}
-
-void simplify_rows_m4(glm::mat4 &m4, glm::vec4 &b, int main_row, int col) {
-  m4 = glm::transpose(m4);
-
-  for (int i = 3; i > main_row; i--) {
-    b[i]  -= (m4[i][col] / m4[main_row][col]) *  b[main_row];
-    m4[i] -= (m4[i][col] / m4[main_row][col]) * m4[main_row];
-  }
-
-  for (int i = 0; i < main_row; i++) {
-    b[i]  -= (m4[i][col] / m4[main_row][col]) *  b[main_row];
-    m4[i] -= (m4[i][col] / m4[main_row][col]) * m4[main_row];
-  }
-
-  b[main_row]  = (1.0f / m4[main_row][col]) *  b[main_row];
-  m4[main_row] = (1.0f / m4[main_row][col]) * m4[main_row];
-
-  m4 = glm::transpose(m4);
-}
-
 void sort_segment_points(Segment1D &seg) {
   if (seg.dots[0] > seg.dots[1]) {
     float tmp = seg.dots[0];
@@ -235,4 +166,80 @@ void sort_segment_points(Segment1D &seg) {
 
 void print_vec3(glm::vec3 v) {
   std::cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
+}
+
+bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
+  for (int col = 0, row = 0; col < (int)mat.size() && row < 3; col++) {
+    int max_row_index = find_max_abs_element_v3(mat[col], row);
+
+    if (fabsf(mat[col][max_row_index]) < 0.001f) {
+      mat[col] = glm::vec3(0.0f);
+    } else {
+      swap_rows_mat(mat, row, max_row_index);
+      swap_elem_v3(b, row, max_row_index);
+      simplify_rows_mat(mat, b, row, col);
+
+      row++;
+    }
+  }
+
+  for (int i = 0, j = 0; i < mat.size(); i++) {
+    if (fabsf(glm::length(matrix[i])) < 0.001f) {
+      res_coeff[i] = 0.0f;
+    } else {
+      res_coeff[i] = b[j];
+      j++;
+    }
+    std::cout << res_coeff[i] << " ";
+  }
+
+  std::cout << std::endl;
+  return true;
+}
+
+int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
+  int res = start_index;
+  for (int i = start_index; i < 3; i++) {
+    if (fabsf(v3[res]) < fabsf(v3[i]))
+      res = i;
+  }
+  return res;
+}
+
+void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j) {
+  for (int l = 0; l < mat.size(); l++)
+    swap_elem_v3(mat[i], i, j);
+}
+
+void swap_elem_v3(glm::vec3 &v3, int i, int j) {
+  float tmp = v3[i];
+  v3[i] = v3[j];
+  v3[j] = tmp;
+}
+
+void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
+                       int main_row, int col) {
+  for (int i = 0; i < main_row; i++) {
+    
+
+
+  }
+
+  /*  mat = glm::transpose(m3);
+
+  for (int i = 2; i > main_row; i--) {
+    b[i]  -= (m3[i][col] / m3[main_row][col]) *  b[main_row];
+    m3[i] -= (m3[i][col] / m3[main_row][col]) * m3[main_row];
+  }
+
+  for (int i = 0; i < main_row; i++) {
+    b[i]  -= (m3[i][col] / m3[main_row][col]) *  b[main_row];
+    m3[i] -= (m3[i][col] / m3[main_row][col]) * m3[main_row];
+  }
+
+  b[main_row]  = (1.0f / m3[main_row][col]) *  b[main_row];
+  m3[main_row] = (1.0f / m3[main_row][col]) * m3[main_row];
+
+  m3 = glm::transpose(m3);
+  */
 }
