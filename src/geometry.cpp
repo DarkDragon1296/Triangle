@@ -83,7 +83,7 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
   mat.push_back(tr2.dots[1] - tr2.dots[0]);
   mat.push_back(tr2.dots[2] - tr2.dots[0]);
 
-  glm::vec4 b  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
+  glm::vec4 b  = glm::vec4(tr1.dots[0] - tr2.dots[0], 0.0f);
   float coeffs[4];
 
   get_lc_coeffs(mat, b, coeffs);
@@ -191,7 +191,7 @@ bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
       swap_rows_mat(mat, row, max_row_index);
       swap_elem_v3(b, row, max_row_index);
       printf_mat(mat, b); // TODO: del
-      std::cout << "{" << row << ", " << col << "}" << std::endl; \\ TODO: del
+      std::cout << "{" << row << ", " << col << "}" << std::endl; // TODO: del
       simplify_rows_mat(mat, b, row, col);
       printf_mat(mat, b); // TODO: del
       row++;
