@@ -52,12 +52,14 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Line line{};
 
   get_line(tr1, tr2, line);
+  Segment3D seg_3d{};
+  return seg_3d;
   std::cout << "line: offset = ";
   print_vec3(line.offset);
   std::cout << ", direction = ";
   print_vec3(line.e);
   std::cout << std::endl; // TODO: del
-
+/*
   bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
   bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
 
@@ -66,56 +68,64 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
 
   if (!is_seg2_exist)
     std::cout << "seg2 isn't exist" << std::endl;
-
+*/
   get_1d_intersection_segment(seg1, seg2, seg_1d_res);
-  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
+//  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 
   return seg_3d;
 }
 
 void get_line(Triangle tr1, Triangle tr2, Line &line) {
-  glm::vec4 a1 = glm::vec4(tr1.dots[1] - tr1.dots[0], 0.0f);
-  glm::vec4 a2 = glm::vec4(tr1.dots[2] - tr1.dots[0], 0.0f);
-  glm::vec4 b1 = glm::vec4(tr2.dots[1] - tr2.dots[0], 0.0f);
-  glm::vec4 b2 = glm::vec4(tr2.dots[2] - tr2.dots[0], 0.0f);
+  std::vector<glm::vec3> mat;
 
-  glm::mat4 sle(a1, a2, b1, b2);
-  glm::vec4 c  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
+  mat.push_back(tr1.dots[1] - tr1.dots[0]);
+  mat.push_back(tr1.dots[2] - tr1.dots[0]);
+  mat.push_back(tr2.dots[1] - tr2.dots[0]);
+  mat.push_back(tr2.dots[2] - tr2.dots[0]);
 
-  glm::vec4 sle_res = solve_sle4(sle, c);
-  std::cout << "sle res = ";
-  print_vec3(glm::vec3(sle_res));
-  std::cout << std::endl;
+  glm::vec4 b  = glm::vec4(tr2.dots[0] - tr2.dots[0], 0.0f);
+  float coeffs[4];
 
-  line.offset = tr1.dots[0] + sle_res[0] * (tr1.dots[1] - tr1.dots[0])
-                            + sle_res[1] * (tr1.dots[2] - tr1.dots[0]);
+  get_lc_coeffs(mat, b, coeffs);
+
+  line.offset = tr1.dots[0] + coeffs[0] * (tr1.dots[1] - tr1.dots[0])
+                            + coeffs[1] * (tr1.dots[2] - tr1.dots[0]);
 
   glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
                             tr1.dots[2] - tr1.dots[0]);
   glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
                             tr2.dots[2] - tr2.dots[0]);
+
   line.e = glm::normalize(glm::cross(n1, n2));
 }
 
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
+/*
   glm::vec4 z(0.0f);
   glm::mat4 sle(glm::vec4(line.e, 0.0f), z, z, z);
   int segment_counter = 0;
+*/
+
+  int segment_counter = 0;
+  float *coeffs = new float(4);
+  std::vector<glm::vec3> mat;
+  mat.push_back(line.e);
 
   for (int i = 0; i < 3; i++) {
-    sle[1] = glm::vec4(tr.dots[(i + 1) % 3] - tr.dots[i % 3], 0.0f);
+    mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
+    glm::vec3 b = line.offset - tr.dots[i % 3];
 
-    glm::vec4 c = glm::vec4(line.offset - tr.dots[i % 3], 0.0f);
-    glm::vec4 sle_res = solve_sle4(sle, c);
+    get_lc_coeffs(mat, b, coeffs);
 
-    // TODO: del
-    std::cout << "[" << sle_res[0] << ", " << sle_res[1] << "]" << std::endl;
-
-    if (fabsf(sle_res[1]) <= 1.0f && segment_counter < 2) {
-      seg.dots[segment_counter] = sle_res[0];
+    if (fabsf(coeffs[1]) <= 1.0f && segment_counter < 2) {
+      seg.dots[segment_counter] = coeffs[0];
       segment_counter++;
     }
+
+    mat.pop_back();
   }
+
+  delete coeffs;
 
   if (segment_counter < 2)
     return false;
@@ -168,32 +178,37 @@ void print_vec3(glm::vec3 v) {
   std::cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
 }
 
+// TODO: добавить проверку на несовместность системы
 bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
-  for (int col = 0, row = 0; col < (int)mat.size() && row < 3; col++) {
-    int max_row_index = find_max_abs_element_v3(mat[col], row);
+  printf_mat(mat, b); // TODO: del
 
-    if (fabsf(mat[col][max_row_index]) < 0.001f) {
-      mat[col] = glm::vec3(0.0f);
+  for (int col = 0, row = 0; col < int(mat.size()) && row < 3; col++) {
+    int max_row_index = find_max_abs_element_v3(mat[size_t(col)], row);
+
+    if (fabsf(mat[size_t(col)][max_row_index]) < 0.001f) {
+      mat[size_t(col)] = glm::vec3(0.0f);
     } else {
       swap_rows_mat(mat, row, max_row_index);
       swap_elem_v3(b, row, max_row_index);
+      printf_mat(mat, b); // TODO: del
+      std::cout << "{" << row << ", " << col << "}" << std::endl; \\ TODO: del
       simplify_rows_mat(mat, b, row, col);
-
+      printf_mat(mat, b); // TODO: del
       row++;
     }
   }
 
-  for (int i = 0, j = 0; i < mat.size(); i++) {
-    if (fabsf(glm::length(mat[i])) < 0.001f) {
+  for (int i = 0, j = 0; i < int(mat.size()) && j < 3; i++) {
+    if (fabsf(glm::length(mat[size_t(i)])) < 0.001f) {
       res_coeff[i] = 0.0f;
     } else {
       res_coeff[i] = b[j];
       j++;
     }
-    std::cout << res_coeff[i] << " ";
+    std::cout << res_coeff[i] << " "; //TODO: del
   }
 
-  std::cout << std::endl;
+  std::cout << std::endl; // TODO: del
   return true;
 }
 
@@ -207,8 +222,8 @@ int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
 }
 
 void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j) {
-  for (int l = 0; l < mat.size(); l++)
-    swap_elem_v3(mat[i], i, j);
+  for (int l = 0; l < int(mat.size()); l++)
+    swap_elem_v3(mat[size_t(i)], i, j);
 }
 
 void swap_elem_v3(glm::vec3 &v3, int i, int j) {
@@ -219,16 +234,38 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j) {
 
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
                        int main_row, int col) {
-  for (int i = 0; i < main_row; i++) {
-    b[i]   -= (mat[i][col] / mat[main_row][col]) *  b[main_row];
-    mat[i] -= (mat[i][col] / mat[main_row][col]) * mat[main_row];
+  size_t col_st = size_t(col);
+  float coeff;
+
+  for (int j = 0; j < 3; j++) {
+    if (j == main_row)
+      j++;
+    if (j == 3)
+      break;
+
+    coeff = mat[col_st][j] / mat[col_st][main_row];
+
+    for (size_t i = 0; i < mat.size(); i++) {
+      mat[i][j] -= coeff * mat[i][main_row];
+    }
+
+    b[j] -= coeff * b[main_row];
   }
 
-  for (int i = main_row + 1; i < mat.size(); i++) {
-    b[i]   -= (mat[i][col] / mat[main_row][col]) *  b[main_row];
-    mat[i] -= (mat[i][col] / mat[main_row][col]) * mat[main_row];
-  }
+  coeff = 1.0f / mat[col_st][main_row];
 
-  b[main_row]   = (1.0f / mat[main_row][col]) *  b[main_row];
-  mat[main_row] = (1.0f / mat[main_row][col]) * mat[main_row];
+  for (size_t i = 0; i < mat.size(); i++)
+    mat[i][main_row] *= coeff;;
+
+  b[main_row] *= coeff;
+}
+
+void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b) {
+  for (int j = 0; j < 3; j++) {
+    for (size_t i = 0; i < mat.size(); i++) {
+      std::cout << mat[i][j] << " ";
+    }
+    std::cout << "| " << b[j] << std::endl;
+  }
+  std::cout << std::endl;
 }

@@ -58,3 +58,4 @@ void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j);
 void swap_elem_v3(glm::vec3 &v3, int i, int j);
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
                        int main_row, int col);
+void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b);
