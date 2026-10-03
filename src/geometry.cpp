@@ -52,14 +52,12 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Line line{};
 
   get_line(tr1, tr2, line);
-  Segment3D seg_3d{};
-  return seg_3d;
   std::cout << "line: offset = ";
   print_vec3(line.offset);
   std::cout << ", direction = ";
   print_vec3(line.e);
   std::cout << std::endl; // TODO: del
-/*
+
   bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
   bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
 
@@ -68,10 +66,10 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
 
   if (!is_seg2_exist)
     std::cout << "seg2 isn't exist" << std::endl;
-*/
-  get_1d_intersection_segment(seg1, seg2, seg_1d_res);
-//  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 
+  get_1d_intersection_segment(seg1, seg2, seg_1d_res);
+
+  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
   return seg_3d;
 }
 
@@ -83,7 +81,7 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
   mat.push_back(tr2.dots[1] - tr2.dots[0]);
   mat.push_back(tr2.dots[2] - tr2.dots[0]);
 
-  glm::vec4 b  = glm::vec4(tr1.dots[0] - tr2.dots[0], 0.0f);
+  glm::vec4 b  = glm::vec4(tr2.dots[0] - tr1.dots[0], 0.0f);
   float coeffs[4];
 
   get_lc_coeffs(mat, b, coeffs);
@@ -100,14 +98,8 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
 }
 
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
-/*
-  glm::vec4 z(0.0f);
-  glm::mat4 sle(glm::vec4(line.e, 0.0f), z, z, z);
   int segment_counter = 0;
-*/
-
-  int segment_counter = 0;
-  float *coeffs = new float(4);
+  float coeffs[2];
   std::vector<glm::vec3> mat;
   mat.push_back(line.e);
 
@@ -125,17 +117,14 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
     mat.pop_back();
   }
 
-  delete coeffs;
-
   if (segment_counter < 2)
     return false;
 
   return true;
 }
 
-bool get_1d_intersection_segment(Segment1D seg1,
-                                Segment1D seg2,
-                                Segment1D &seg_res) {
+bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
+                                 Segment1D &seg_res) {
   sort_segment_points(seg1);
   sort_segment_points(seg2);
 
@@ -180,7 +169,6 @@ void print_vec3(glm::vec3 v) {
 
 // TODO: добавить проверку на несовместность системы
 bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
-  printf_mat(mat, b); // TODO: del
 
   for (int col = 0, row = 0; col < int(mat.size()) && row < 3; col++) {
     int max_row_index = find_max_abs_element_v3(mat[size_t(col)], row);
@@ -190,10 +178,7 @@ bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
     } else {
       swap_rows_mat(mat, row, max_row_index);
       swap_elem_v3(b, row, max_row_index);
-      printf_mat(mat, b); // TODO: del
-      std::cout << "{" << row << ", " << col << "}" << std::endl; // TODO: del
       simplify_rows_mat(mat, b, row, col);
-      printf_mat(mat, b); // TODO: del
       row++;
     }
   }

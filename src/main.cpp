@@ -62,6 +62,8 @@ int main(void) {
   print_vec3(objs.segments[0].dots[0]);
   print_vec3(objs.segments[0].dots[1]);
 
+  glLineWidth(10.0f);
+
   while (!glfwWindowShouldClose(window)) {
     process_input(window);
     clear_window();
