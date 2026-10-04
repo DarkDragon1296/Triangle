@@ -10,6 +10,7 @@ enum WindowProperties {
   WIDTH  = 800
 };
 
+// TODO: Перенести это куда-то
 enum TriangleTestProperties {
   TRIANGLES_AMOUNT = 20,
   RADIUS_1 = 9,
@@ -26,9 +27,17 @@ struct VertexInfo {
   uint vao = 0;
 };
 
+struct VertexObjects {
+  VertexInfo triangles;
+  VertexInfo segments;
+};
+
 GLFWwindow *create_window(void);
-void framebuffer_size_callback(GLFWwindow *window, int width, int height);
-void generate_triangle_test(Triangle *triangles);
+RenderObjects get_objects(void);
+VertexObjects get_vertex_objects(const RenderObjects &objs);
 VertexInfo get_buffers(int dots_amount, size_t size, const void *data);
+void generate_triangle_test(Triangle *triangles);
+void framebuffer_size_callback(GLFWwindow *window, int width, int height);
+void setup_render(void);
 void clear_window(void);
 void terminate_processes(VertexInfo &vobjs);

@@ -22,19 +22,13 @@ GLFWwindow *create_window(void) {
   glfwMakeContextCurrent(window);
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     std::cout << "Failed to initialize GLAD" << std::endl;
-  }
-
-  glEnable(GL_DEPTH_TEST);
 
   return window;
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
-  glViewport(0, 0, width, height);
-}
-
+// TODO: Перенести это куда-то
 void generate_triangle_test(Triangle *triangles) {
   float deg_angle[3];
   float rad_angle[3];
@@ -60,6 +54,43 @@ void generate_triangle_test(Triangle *triangles) {
     triangles[i].dots[2][1] = RADIUS_3 * glm::sin(rad_angle[2]);
     triangles[i].dots[2][2] = 0.0f;
   }
+}
+
+RenderObjects get_objects(void) {
+  RenderObjects objs{};
+
+  Triangle tr1 = {{
+    {0.0f, 0.0f, 0.0f},
+    {2.0f, 2.0f, 0.0f},
+    {0.0f, 2.0f, 0.0f}
+  }};
+
+  Triangle tr2 = {{
+    {0.0f, 0.0f,  1.0f},
+    {2.0f, 2.0f,  0.0f},
+    {0.0f, 2.0f, -1.0f}
+  }};
+
+  objs.triangles.push_back(tr1);
+  objs.triangles.push_back(tr2);
+
+  get_intersection_points(tr1, tr2, objs);
+
+  return objs;
+}
+
+VertexObjects get_vertex_objects(const RenderObjects &objs) {
+  VertexObjects vobjs{};
+
+  vobjs.segments = get_buffers(SEGMENT, objs.segments.size()
+                                          * sizeof(Segment3D),
+                                          objs.segments.data());
+
+  vobjs.triangles = get_buffers(TRIANGLE, objs.triangles.size()
+                                           * sizeof(Triangle),
+                                           objs.triangles.data());
+
+  return vobjs;
 }
 
 VertexInfo get_buffers(int dots_amount, size_t size, const void *data) {
@@ -88,4 +119,15 @@ void terminate_processes(VertexInfo& vobjs) {
   glDeleteVertexArrays(1, &vobjs.vao);
   glDeleteBuffers(1, &vobjs.vbo);
   glfwTerminate();
+}
+
+void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+  glViewport(0, 0, width, height);
+}
+
+void setup_render(void) {
+  glEnable(GL_DEPTH_TEST);
+  glDepthFunc(GL_LESS);
+  glLineWidth(10.0f);
+  glEnable(GL_LINE_SMOOTH);
 }
