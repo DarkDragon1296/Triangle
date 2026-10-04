@@ -3,11 +3,10 @@
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <cmath>
-#include <iostream> // TODO: del
+#include <iostream>
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
   int dim = get_intersection_dim(tr1, tr2);
-  std::cout << "dim = " << dim << std::endl; // TODO: del
 
   if (dim == 1) {
     Segment3D segment = get_3d_segment(tr1, tr2);
@@ -50,13 +49,7 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
 Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Segment1D seg1{}, seg2{}, seg_1d_res{};
   Line line{};
-
   get_line(tr1, tr2, line);
-  std::cout << "line: offset = ";
-  print_vec3(line.offset);
-  std::cout << ", direction = ";
-  print_vec3(line.e);
-  std::cout << std::endl; // TODO: del
 
   bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
   bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
@@ -68,8 +61,8 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
     std::cout << "seg2 isn't exist" << std::endl;
 
   get_1d_intersection_segment(seg1, seg2, seg_1d_res);
-
   Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
+
   return seg_3d;
 }
 
@@ -101,7 +94,7 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
   int segment_counter = 0;
   float coeffs[2];
   std::vector<glm::vec3> mat;
-  mat.push_back(line.e);
+  mat.push_back(-line.e);
 
   for (int i = 0; i < 3; i++) {
     mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
@@ -113,6 +106,9 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
       seg.dots[segment_counter] = coeffs[0];
       segment_counter++;
     }
+
+    if (fabsf(coeffs[0] - coeffs[1]) < 0.001f && segment_counter == 2)
+      segment_counter--;
 
     mat.pop_back();
   }
@@ -144,7 +140,7 @@ Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d) {
   seg_3d.dots[1] = line.offset + seg_1d.dots[1] * line.e;
 
   return seg_3d;
-}
+} 
 
 void get_plane(Triangle tr, glm::vec3 &plane_offset,
                glm::vec3 &dir1, glm::vec3 &dir2) {
@@ -190,10 +186,8 @@ bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
       res_coeff[i] = b[j];
       j++;
     }
-    std::cout << res_coeff[i] << " "; //TODO: del
   }
 
-  std::cout << std::endl; // TODO: del
   return true;
 }
 
@@ -219,6 +213,9 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j) {
 
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
                        int main_row, int col) {
+  if (fabsf(mat[size_t(col)][main_row]) < 0.001f)
+    return;
+
   size_t col_st = size_t(col);
   float coeff;
 

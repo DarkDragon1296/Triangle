@@ -7,12 +7,6 @@
 // TODO: добавить константность параметров там, где необходимо
 // TODO: рассмотреть случай, если какой-нибудь нехороший человек передаст точки
 //       на одной прямой вместо треугольника
-// TODO: переписать solve_sle4 в функцию, принимающую std вектор из vec3, и
-//       возвращающий параметры линейной комбинации
-// TODO: пофиксить математику:
-//       1) line.offset находится с ошибкой
-// TODO: В математике переименовать названия main_row и тд на нечто другое, тк
-//       в этом случае это вовсе не row
 
 #include "glad.hpp"
 #include "shader.hpp"
@@ -39,7 +33,6 @@ int main(void) {
     {2.0f, 2.0f, 0.0f},
     {0.0f, 2.0f, 0.0f}
   }};
-
   Triangle tr2 = {{
     {0.0f, 0.0f,  1.0f},
     {2.0f, 2.0f,  0.0f},
@@ -50,6 +43,7 @@ int main(void) {
   objs.triangles.push_back(tr2);
 
   get_intersection_points(tr1, tr2, objs);
+
   VertexInfo vobjs_segments = get_buffers(SEGMENT, objs.segments.size()
                                           * sizeof(Segment3D),
                                           objs.segments.data());
@@ -57,10 +51,6 @@ int main(void) {
   VertexInfo vobjs_triangles = get_buffers(TRIANGLE, objs.triangles.size()
                                            * sizeof(Triangle),
                                            objs.triangles.data());
-
-  std::cout << "segments: " << std::endl;
-  print_vec3(objs.segments[0].dots[0]);
-  print_vec3(objs.segments[0].dots[1]);
 
   glLineWidth(10.0f);
 
@@ -103,11 +93,12 @@ int main(void) {
     glBindVertexArray(vobjs_triangles.vao);
     glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
 
+
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
 
-//  terminate_processes(vobjs);
+  terminate_processes(vobjs_triangles);
   terminate_processes(vobjs_segments);
 
   return 0;
