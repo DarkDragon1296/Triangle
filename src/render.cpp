@@ -1,8 +1,10 @@
 #include "glad.hpp"
+#include "render.hpp"
+#include "shader.hpp"
+
 #include <glm/ext.hpp>
 #include <iostream>
 #include <GLFW/glfw3.h>
-#include "render.hpp"
 
 GLFWwindow *create_window(void) {
   glfwInit();
@@ -108,6 +110,20 @@ VertexInfo get_buffers(int dots_amount, size_t size, const void *data) {
   glEnableVertexAttribArray(0);
 
   return vobjs;
+}
+
+void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
+                  const Shader &shader) {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0f, 8.0f);
+    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
+    glBindVertexArray(vobjs.segments.vao);
+    glDrawArrays(GL_LINES, 0, 2 * (GLsizei)objs.segments.size());
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
+    glBindVertexArray(vobjs.triangles.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
 }
 
 void clear_window(void) {

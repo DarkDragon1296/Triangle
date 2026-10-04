@@ -3,8 +3,6 @@
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
-// TODO: рассмотреть случай, если какой-нибудь нехороший человек передаст точки
-//       на одной прямой вместо треугольника
 
 #include "glad.hpp"
 #include "shader.hpp"
@@ -57,17 +55,7 @@ int main(void) {
     shader.set_mat4("projection", projection);
     // end
 
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.0f, 8.0f);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
-    glBindVertexArray(vobjs.segments.vao);
-    glDrawArrays(GL_LINES, 0, 2 * (GLsizei)objs.segments.size());
-
-    glDisable(GL_POLYGON_OFFSET_FILL);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
-    glBindVertexArray(vobjs.triangles.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
-
+    draw_objects(objs, vobjs, shader);
 
     glfwSwapBuffers(window);
     glfwPollEvents();
