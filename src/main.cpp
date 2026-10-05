@@ -3,6 +3,8 @@
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
+// TODO: обернуть всё в пространства имен
+// TODO: Camera class
 
 #include "glad.hpp"
 #include "shader.hpp"

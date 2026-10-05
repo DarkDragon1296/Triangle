@@ -84,4 +84,3 @@ target_link_libraries(
     glm::glm
     glfw
 )
-
