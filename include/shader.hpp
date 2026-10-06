@@ -2,10 +2,13 @@
 
 #include "glad.hpp"
 #include "types.hpp"
+#include "utils.hpp"
 
 #include <glm/fwd.hpp>
 #include <glm/detail/type_mat4x4.hpp>
 #include <string>
+
+namespace TOP_LEVEL_NAMESPACE {
 
 class Shader {
   public:
@@ -31,3 +34,5 @@ class Shader {
                        GL_FALSE, &mat[0][0]);
   }
 };
+
+}

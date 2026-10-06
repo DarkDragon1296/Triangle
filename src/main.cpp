@@ -18,6 +18,8 @@
 const char *vshader_path = "src/shaders/vertex_shader.vs";
 const char *fshader_path = "src/shaders/fragment_shader.fs";
 
+using namespace TOP_LEVEL_NAMESPACE;
+
 int main(void) {
   GLFWwindow *window = create_window();
   Shader shader = Shader(vshader_path, fshader_path);

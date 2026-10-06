@@ -6,6 +6,8 @@
 #include <iostream>
 #include <GLFW/glfw3.h>
 
+namespace TOP_LEVEL_NAMESPACE {
+
 GLFWwindow *create_window(void) {
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -95,7 +97,8 @@ VertexObjects get_vertex_objects(const RenderObjects &objs) {
   return vobjs;
 }
 
-VertexInfo get_buffers(int dots_amount, size_t size, const void *data) {
+VertexInfo get_buffers([[maybe_unused]] int dots_amount, 
+                       size_t size, const void *data) {
   VertexInfo vobjs{};
 
   glGenVertexArrays(1, &vobjs.vao);
@@ -137,7 +140,8 @@ void terminate_processes(VertexInfo& vobjs) {
   glfwTerminate();
 }
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
+void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, 
+                               int width, int height) {
   glViewport(0, 0, width, height);
 }
 
@@ -146,4 +150,6 @@ void setup_render(void) {
   glDepthFunc(GL_LESS);
   glLineWidth(10.0f);
   glEnable(GL_LINE_SMOOTH);
+}
+
 }

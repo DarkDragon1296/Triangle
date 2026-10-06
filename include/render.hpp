@@ -6,6 +6,8 @@
 
 #include <GLFW/glfw3.h>
 
+namespace TOP_LEVEL_NAMESPACE {
+
 enum WindowProperties {
   HEIGHT = 600,
   WIDTH  = 800
@@ -44,3 +46,5 @@ void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
 void setup_render(void);
 void clear_window(void);
 void terminate_processes(VertexInfo &vobjs);
+
+}

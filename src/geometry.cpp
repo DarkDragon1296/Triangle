@@ -1,9 +1,12 @@
 #include "geometry.hpp"
+#include "utils.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <cmath>
 #include <iostream>
+
+namespace TOP_LEVEL_NAMESPACE {
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
   int dim = get_intersection_dim(tr1, tr2);
@@ -250,4 +253,6 @@ void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b) {
     std::cout << "| " << b[j] << std::endl;
   }
   std::cout << std::endl;
+}
+
 }

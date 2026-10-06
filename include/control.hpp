@@ -1,7 +1,11 @@
 #pragma once
 
+#include "utils.hpp"
+
 #include <GLFW/glfw3.h>
 #include <glm/ext.hpp>
+
+namespace TOP_LEVEL_NAMESPACE {
 
 #if 0
 
@@ -26,3 +30,6 @@ class Camera {
 #endif
 
 void process_input(GLFWwindow *window);
+
+}
+

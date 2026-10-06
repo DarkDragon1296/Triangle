@@ -1,8 +1,12 @@
 #pragma once
 
+#include "utils.hpp"
+
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec3.hpp>
 #include <vector>
+
+namespace TOP_LEVEL_NAMESPACE {
 
 enum Figures {
   POINT    = 1,
@@ -59,3 +63,5 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j);
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
                        int main_row, int col);
 void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b);
+
+}

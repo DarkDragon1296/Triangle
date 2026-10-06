@@ -4,6 +4,8 @@
 #include <sstream>
 #include <iostream>
 
+namespace TOP_LEVEL_NAMESPACE {
+
 Shader::Shader(const char *vertex_path, const char *fragment_path) {
   std::string vertex_code;
   std::string fragment_code;
@@ -67,4 +69,6 @@ Shader::Shader(const char *vertex_path, const char *fragment_path) {
 
   glDeleteShader(vertex);
   glDeleteShader(fragment);
+}
+
 }
