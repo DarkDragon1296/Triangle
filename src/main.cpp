@@ -1,14 +1,15 @@
-// TODO: Добавить проверки на шейдеры
 // TODO: Управление камерой
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
 // TODO: Camera class
 
+// TODO: rename namespace
+
 #include "glad.hpp"
 #include "shader.hpp"
 #include "render.hpp"
-#include "control.hpp"
+#include "camera.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
@@ -24,39 +25,29 @@ int main(void) {
   Shader shader = Shader(vshader_path, fshader_path);
   RenderObjects objs  = get_objects();
   VertexObjects vobjs = get_vertex_objects(objs);
+  Camera camera;
 
   setup_render();
 
-  while (!glfwWindowShouldClose(window)) {
-    process_input(window);
+while (!glfwWindowShouldClose(window)) {
+    process_input(window, camera);
     clear_window();
-
     shader.use();
 
-    float radius = 10.0f;
-    float cam_x = static_cast<float>(sin(glfwGetTime()) * 1.25f * radius);
-    float cam_z = static_cast<float>(cos(glfwGetTime()) * radius);
-
-    // start of create_transformations(camera) --> void
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
                                             (float)WIDTH / (float)HEIGHT,
                                             0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
-    glm::mat4 view  = glm::mat4(1.0f);
 
     model = glm::rotate(model, glm::radians(0.0f),
                         glm::vec3(1.0f, 1.0f, 0.0f));
-    view = glm::lookAt(glm::vec3(cam_x, 0.0f, cam_z),
-                       glm::vec3(0.0f , 0.0f, 0.0f ),
-                       glm::vec3(0.0f , 1.0f, 0.0f ));
 
     int model_loc = glGetUniformLocation(shader.id, "model");
     int view_loc = glGetUniformLocation(shader.id, "view");
     glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &view[0][0]);
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &camera.view[0][0]);
 
     shader.set_mat4("projection", projection);
-    // end
 
     draw_objects(objs, vobjs, shader);
 
