@@ -1,4 +1,3 @@
-// TODO: Управление камерой
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
@@ -29,26 +28,11 @@ int main(void) {
 
   setup_render();
 
-while (!glfwWindowShouldClose(window)) {
+  while (!glfwWindowShouldClose(window)) {
     process_input(window, camera);
     clear_window();
-    shader.use();
 
-    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
-                                            (float)WIDTH / (float)HEIGHT,
-                                            0.1f, 100.0f);
-    glm::mat4 model = glm::mat4(1.0f);
-
-    model = glm::rotate(model, glm::radians(0.0f),
-                        glm::vec3(1.0f, 1.0f, 0.0f));
-
-    int model_loc = glGetUniformLocation(shader.id, "model");
-    int view_loc = glGetUniformLocation(shader.id, "view");
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &camera.view[0][0]);
-
-    shader.set_mat4("projection", projection);
-
+    process_transforms(shader, camera);
     draw_objects(objs, vobjs, shader);
 
     glfwSwapBuffers(window);

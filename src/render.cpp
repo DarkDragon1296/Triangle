@@ -1,6 +1,7 @@
 #include "glad.hpp"
 #include "render.hpp"
 #include "shader.hpp"
+#include "camera.hpp"
 
 #include <glm/ext.hpp>
 #include <iostream>
@@ -152,4 +153,21 @@ void setup_render(void) {
   glEnable(GL_LINE_SMOOTH);
 }
 
+void process_transforms(Shader &shader, Camera cam) {
+    shader.use();
+
+    glm::mat4 projection = glm::perspective(glm::radians(45.0f),
+                                            (float)WIDTH / (float)HEIGHT,
+                                            0.1f, 100.0f);
+
+    glm::mat4 model = glm::mat4(1.0f);
+    model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    int model_loc = glGetUniformLocation(shader.id, "model");
+    int view_loc = glGetUniformLocation(shader.id, "view");
+    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &cam.view[0][0]);
+
+    shader.set_mat4("projection", projection);
+}
 }

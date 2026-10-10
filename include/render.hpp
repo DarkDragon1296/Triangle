@@ -3,6 +3,7 @@
 #include "geometry.hpp"
 #include "shader.hpp"
 #include "types.hpp"
+#include "camera.hpp"
 
 #include <GLFW/glfw3.h>
 
@@ -44,6 +45,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
                   const Shader &shader);
 void setup_render(void);
+void process_transforms(Shader &shader, Camera cam);
 void clear_window(void);
 void terminate_processes(VertexInfo &vobjs);
 
