@@ -39,6 +39,8 @@ int main(void) {
 
   terminate_processes(vobjs.triangles);
   terminate_processes(vobjs.segments);
+  glDeleteProgram(shader.id);
+  glfwDestroyWindow(window);
   glfwTerminate();
 
   return 0;
