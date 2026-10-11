@@ -1,7 +1,7 @@
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
-// TODO: Camera class
+// TODO: add bounds for triangles
 
 // TODO: rename namespace
 
@@ -9,7 +9,6 @@
 #include "shader.hpp"
 #include "render.hpp"
 #include "camera.hpp"
-
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>

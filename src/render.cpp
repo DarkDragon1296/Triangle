@@ -2,6 +2,7 @@
 #include "render.hpp"
 #include "shader.hpp"
 #include "camera.hpp"
+#include "test_generator.hpp"
 
 #include <glm/ext.hpp>
 #include <iostream>
@@ -10,78 +11,55 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 GLFWwindow *create_window(void) {
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+    glfwInit();
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
 
-  GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT,
-                                        "triangles",
-                                        NULL, NULL);
+    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "triangles",
+    NULL, NULL);
 
-  if (!window) {
-    std::cout << "Failed to create GLFW window" << std::endl;
-    glfwTerminate();
-  }
+    if (!window) {
+        std::cout << "Failed to create GLFW window" << std::endl;
+        glfwTerminate();
+    }
 
-  glfwMakeContextCurrent(window);
-  glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    std::cout << "Failed to initialize GLAD" << std::endl;
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+        std::cout << "Failed to initialize GLAD" << std::endl;
 
-  return window;
-}
-
-// TODO: Перенести это куда-то
-void generate_triangle_test(Triangle *triangles) {
-  float deg_angle[3];
-  float rad_angle[3];
-
-  for (int i = 0; i < TRIANGLES_AMOUNT; i++) {
-    deg_angle[0] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_1; 
-    deg_angle[1] = (float)i / TRIANGLES_AMOUNT * 360.0f + DEG_ROTATION_2; 
-    deg_angle[2] = (float)i / TRIANGLES_AMOUNT * 360.0f; 
-
-    rad_angle[0] = glm::radians(deg_angle[0]); 
-    rad_angle[1] = glm::radians(deg_angle[1]); 
-    rad_angle[2] = glm::radians(deg_angle[2]); 
-
-    triangles[i].dots[0][0] = RADIUS_1 * glm::cos(rad_angle[0]);
-    triangles[i].dots[0][1] = RADIUS_1 * glm::sin(rad_angle[0]);
-    triangles[i].dots[0][2] = OFFSET_1;
-
-    triangles[i].dots[1][0] = RADIUS_2 * glm::cos(rad_angle[1]);
-    triangles[i].dots[1][1] = RADIUS_2 * glm::sin(rad_angle[1]);
-    triangles[i].dots[1][2] = OFFSET_2;
-
-    triangles[i].dots[2][0] = RADIUS_3 * glm::cos(rad_angle[2]);
-    triangles[i].dots[2][1] = RADIUS_3 * glm::sin(rad_angle[2]);
-    triangles[i].dots[2][2] = 0.0f;
-  }
+    return window;
 }
 
 RenderObjects get_objects(void) {
-  RenderObjects objs{};
+    RenderObjects objs{};
 
-  Triangle tr1 = {{
-    {0.0f, 0.0f, 0.0f},
-    {2.0f, 2.0f, 0.0f},
-    {0.0f, 2.0f, 0.0f}
-  }};
+    Triangle tr1 = {{
+        {0.0f, 0.0f, 0.0f},
+        {2.0f, 2.0f, 0.0f},
+        {0.0f, 2.0f, 0.0f}
+    }};
 
-  Triangle tr2 = {{
-    {0.0f, 0.0f,  1.0f},
-    {2.0f, 2.0f,  0.0f},
-    {0.0f, 2.0f, -1.0f}
-  }};
+    Triangle tr2 = {{
+        {0.0f, 0.0f,  1.0f},
+        {2.0f, 2.0f,  0.0f},
+        {0.0f, 2.0f, -1.0f}
+    }};
 
-  objs.triangles.push_back(tr1);
-  objs.triangles.push_back(tr2);
+    objs.triangles.push_back(tr1);
+    objs.triangles.push_back(tr2);
 
-  get_intersection_points(tr1, tr2, objs);
+    generate_triangle_test(objs.triangles);
 
-  return objs;
+    for (size_t i = 0; i < objs.triangles.size(); i++) {
+        for (size_t j = i + 1; j < objs.triangles.size(); j++) {
+            get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
+        }
+    }
+
+    return objs;
 }
 
 VertexObjects get_vertex_objects(const RenderObjects &objs) {

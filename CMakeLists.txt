@@ -74,6 +74,7 @@ target_sources(
   PRIVATE
     src/main.cpp src/render.cpp src/geometry.cpp
     src/glad.cpp src/shader.cpp src/camera.cpp
+    src/test_generator.cpp
 )
 
 target_link_libraries(

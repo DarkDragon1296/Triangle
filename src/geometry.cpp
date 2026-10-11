@@ -54,15 +54,6 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Line line{};
   get_line(tr1, tr2, line);
 
-  bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
-  bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
-
-  if (!is_seg1_exist)
-    std::cout << "seg1 isn't exist" << std::endl;
-
-  if (!is_seg2_exist)
-    std::cout << "seg2 isn't exist" << std::endl;
-
   get_1d_intersection_segment(seg1, seg2, seg_1d_res);
   Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 
