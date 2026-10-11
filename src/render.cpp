@@ -51,7 +51,9 @@ RenderObjects get_objects(void) {
     objs.triangles.push_back(tr1);
     objs.triangles.push_back(tr2);
 
+#if 1
     generate_triangle_test(objs.triangles);
+#endif
 
     for (size_t i = 0; i < objs.triangles.size(); i++) {
         for (size_t j = i + 1; j < objs.triangles.size(); j++) {

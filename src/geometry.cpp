@@ -54,6 +54,9 @@ Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
   Line line{};
   get_line(tr1, tr2, line);
 
+  get_1d_segment(tr1, line, seg1);
+  get_1d_segment(tr2, line, seg2);
+
   get_1d_intersection_segment(seg1, seg2, seg_1d_res);
   Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
 

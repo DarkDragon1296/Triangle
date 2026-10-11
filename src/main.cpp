@@ -2,7 +2,7 @@
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
 // TODO: add bounds for triangles
-
+// TODO: window size change bag
 // TODO: rename namespace
 
 #include "glad.hpp"

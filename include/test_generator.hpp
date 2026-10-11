@@ -6,7 +6,7 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 1000,
+    TRIANGLES_AMOUNT = 1,
     RADIUS_1 = 9,
     RADIUS_2 = 6,
     RADIUS_3 = -5,
