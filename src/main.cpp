@@ -1,7 +1,6 @@
 // TODO: тесты на винде
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
-// TODO: add bounds for triangles
 // TODO: window size change bag
 // TODO: rename namespace
 
@@ -21,7 +20,7 @@ using namespace TOP_LEVEL_NAMESPACE;
 int main(void) {
   GLFWwindow *window = create_window();
   Shader shader = Shader(vshader_path, fshader_path);
-  RenderObjects objs  = get_objects();
+  RenderObjects objs  = get_objects(); // TODO: (*) combine objs and vobjs
   VertexObjects vobjs = get_vertex_objects(objs);
   Camera camera;
 
@@ -40,6 +39,7 @@ int main(void) {
 
   terminate_processes(vobjs.triangles);
   terminate_processes(vobjs.segments);
+  glfwTerminate();
 
   return 0;
 }

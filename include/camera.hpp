@@ -42,7 +42,7 @@ class Camera {
         yaw   += yaw_deg;
         pitch += pitch_deg;
 
-        if (pitch > 89.0f) {
+        if (pitch > 89.0f) { // TODO: (*) task for Leonid
             pitch = 89.0f;
         } else if (pitch < -89.0f) {
             pitch = -89.0f;

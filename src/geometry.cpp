@@ -9,15 +9,23 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
-  int dim = get_intersection_dim(tr1, tr2);
+    if (is_no_intersections(tr1, tr2))
+        return;
 
-  if (dim == 1) {
-    Segment3D segment = get_3d_segment(tr1, tr2);
-    objs.segments.push_back(segment);
+    int dim = get_intersection_dim(tr1, tr2);
 
-  } else if (dim == 2) {
-    /* TODO: */
-  }
+    if (dim == 1) {
+        Segment3D segment = get_3d_segment(tr1, tr2);
+        objs.segments.push_back(segment);
+
+    } else if (dim == 2) {
+        /* TODO: */
+    }
+}
+
+bool is_no_intersections(Triangle tr1, Triangle tr2) {
+    /* TODO: (*) write this function*/
+    return false;
 }
 
 int get_intersection_dim(Triangle tr1, Triangle tr2) {

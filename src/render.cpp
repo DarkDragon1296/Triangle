@@ -78,7 +78,7 @@ VertexObjects get_vertex_objects(const RenderObjects &objs) {
   return vobjs;
 }
 
-VertexInfo get_buffers([[maybe_unused]] int dots_amount, 
+VertexInfo get_buffers([[maybe_unused]] int dots_amount, // TODO: (*) actually unused
                        size_t size, const void *data) {
   VertexInfo vobjs{};
 
@@ -118,12 +118,11 @@ void clear_window(void) {
 void terminate_processes(VertexInfo& vobjs) {
   glDeleteVertexArrays(1, &vobjs.vao);
   glDeleteBuffers(1, &vobjs.vbo);
-  glfwTerminate();
 }
 
 void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, 
                                int width, int height) {
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, width, height); // TODO: (*) window resize fix
 }
 
 void setup_render(void) {
