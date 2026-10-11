@@ -45,7 +45,7 @@ struct RenderObjects {
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs);
 bool is_no_intersections(Triangle tr1, Triangle tr2);
 int get_intersection_dim(Triangle tr1, Triangle tr2);
-Segment3D get_3d_segment(Triangle tr1, Triangle tr2);
+bool get_3d_segment(Triangle tr1, Triangle tr2, Segment3D &seg_3d);
 void get_line(Triangle tr1, Triangle tr2, Line &line);
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg1);
 bool get_1d_intersection_segment(Segment1D seg1,

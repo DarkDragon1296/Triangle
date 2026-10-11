@@ -48,11 +48,10 @@ RenderObjects get_objects(void) {
         {0.0f, 2.0f, -1.0f}
     }};
 
+    generate_triangle_test(objs.triangles);
+#if 0
     objs.triangles.push_back(tr1);
     objs.triangles.push_back(tr2);
-
-#if 1
-    generate_triangle_test(objs.triangles);
 #endif
 
     for (size_t i = 0; i < objs.triangles.size(); i++) {
@@ -67,11 +66,11 @@ RenderObjects get_objects(void) {
 VertexObjects get_vertex_objects(const RenderObjects &objs) {
   VertexObjects vobjs{};
 
-  vobjs.segments = get_buffers(SEGMENT, objs.segments.size()
+    vobjs.segments = get_buffers(SEGMENT, objs.segments.size()
                                           * sizeof(Segment3D),
                                           objs.segments.data());
 
-  vobjs.triangles = get_buffers(TRIANGLE, objs.triangles.size()
+    vobjs.triangles = get_buffers(TRIANGLE, objs.triangles.size()
                                            * sizeof(Triangle),
                                            objs.triangles.data());
 

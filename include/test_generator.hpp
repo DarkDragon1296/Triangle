@@ -6,14 +6,14 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 10,
+    TRIANGLES_AMOUNT = 2,
     RADIUS_1 = 9,
-    RADIUS_2 = 8,
-    RADIUS_3 = 7,
+    RADIUS_2 = 9,
+    RADIUS_3 = -9,
     OFFSET_1 = 10,
-    OFFSET_2 = -10,
+    OFFSET_2 = 10,
     DEG_ROTATION_1 = 10,
-    DEG_ROTATION_2 = 30
+    DEG_ROTATION_2 = 90
 };
 
 void generate_triangle_test(std::vector<Triangle> &triangles);

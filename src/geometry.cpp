@@ -15,8 +15,10 @@ void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
     int dim = get_intersection_dim(tr1, tr2);
 
     if (dim == 1) {
-        Segment3D segment = get_3d_segment(tr1, tr2);
-        objs.segments.push_back(segment);
+        Segment3D segment;
+        bool is_exist = get_3d_segment(tr1, tr2, segment);
+        if (is_exist)
+            objs.segments.push_back(segment);
 
     } else if (dim == 2) {
         /* TODO: */
@@ -57,18 +59,23 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
   return 2;
 }
 
-Segment3D get_3d_segment(Triangle tr1, Triangle tr2) {
-  Segment1D seg1{}, seg2{}, seg_1d_res{};
-  Line line{};
-  get_line(tr1, tr2, line);
+bool get_3d_segment(Triangle tr1, Triangle tr2, Segment3D &seg_3d) {
+    Segment1D seg1{}, seg2{}, seg_1d_res{};
+    Line line{};
+    get_line(tr1, tr2, line);
 
-  get_1d_segment(tr1, line, seg1);
-  get_1d_segment(tr2, line, seg2);
+    bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
+    bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
 
-  get_1d_intersection_segment(seg1, seg2, seg_1d_res);
-  Segment3D seg_3d = segment_transform_1d_3d(line, seg_1d_res);
+    if (!is_seg1_exist || !is_seg2_exist)
+        return false;
 
-  return seg_3d;
+    bool is_exist = get_1d_intersection_segment(seg1, seg2, seg_1d_res);
+
+    if (is_exist)
+        seg_3d = segment_transform_1d_3d(line, seg_1d_res);
+
+    return true;
 }
 
 void get_line(Triangle tr1, Triangle tr2, Line &line) {
@@ -97,23 +104,24 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
 
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
   int segment_counter = 0;
-  float coeffs[2];
   std::vector<glm::vec3> mat;
   mat.push_back(-line.e);
 
   for (int i = 0; i < 3; i++) {
+    float coeffs[2];
+
     mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
     glm::vec3 b = line.offset - tr.dots[i % 3];
 
     get_lc_coeffs(mat, b, coeffs);
 
-    if (fabsf(coeffs[1]) <= 1.0f && segment_counter < 2) {
+    if (coeffs[1] <= 1.0f) {
       seg.dots[segment_counter] = coeffs[0];
       segment_counter++;
     }
 
-    if (fabsf(coeffs[0] - coeffs[1]) < 0.001f && segment_counter == 2)
-      segment_counter--;
+    if (segment_counter == 2)
+      break;
 
     mat.pop_back();
   }
@@ -129,7 +137,7 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
   sort_segment_points(seg1);
   sort_segment_points(seg2);
 
-  if (seg1.dots[1] < seg2.dots[0] || seg2.dots[1] < seg1.dots[1])
+  if (seg1.dots[1] < seg2.dots[0] || seg2.dots[1] < seg1.dots[0])
     return false;
 
   seg_res.dots[0] = seg1.dots[0] > seg2.dots[0] ? seg1.dots[0] : seg2.dots[0];
