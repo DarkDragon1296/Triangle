@@ -11,9 +11,11 @@ namespace TOP_LEVEL_NAMESPACE {
 static inline bool fequals(float a, float b);
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
+#if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
         return;
+#endif
 
     int dim = get_intersection_dim(tr1, tr2);
 
@@ -32,14 +34,15 @@ void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
 /// determined that subject is entirely in one 
 /// of the halfspaces created by divider
 bool halfspace_test(Triangle divider, Triangle subject) {
-    glm::vec3 a = divider.dots[2] - divider.dots[0];
-    glm::vec3 b = divider.dots[2] - divider.dots[1];
+    glm::vec3 a = divider.dots[1] - divider.dots[0];
+    glm::vec3 b = divider.dots[2] - divider.dots[0];
     glm::vec3 n = glm::cross(a, b);
 
     bool first_iteration   = true;
     bool in_left_halfspace = false;
     float d = glm::dot(n, divider.dots[0]);
-    for (uint i = 0; i < 2; i++) {
+
+    for (uint i = 0; i < 3; i++) {
         float plane_equation_res = glm::dot(n, subject.dots[i]) - d;
         if (fequals(plane_equation_res, 0.0f))
             return false;
@@ -81,10 +84,10 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
         return 1;
 
     glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
-        - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
+                                       - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
 
     glm::vec3 pl2_offset = tr2.dots[0] - glm::dot(tr2.dots[0], a_tr2) * a_tr2
-        - glm::dot(tr2.dots[0], b_tr2) * b_tr2;
+                                       - glm::dot(tr2.dots[0], b_tr2) * b_tr2;
 
     pl1_offset = glm::normalize(pl1_offset);
     pl2_offset = glm::normalize(pl2_offset);
@@ -261,7 +264,7 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j) {
 }
 
 void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
-        int main_row, int col) {
+                       int main_row, int col) {
     if (fabsf(mat[size_t(col)][main_row]) < 0.001f)
         return;
 
