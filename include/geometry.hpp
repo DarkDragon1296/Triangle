@@ -56,7 +56,6 @@ void get_plane(Triangle tr, glm::vec3 &plane_offset,
                glm::vec3 &dir1, glm::vec3 &dir2);
 void sort_segment_points(Segment1D &seg);
 void print_vec3(glm::vec3 v);
-
 bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff);
 int find_max_abs_element_v3(glm::vec3 v3, int start_index);
 void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j);

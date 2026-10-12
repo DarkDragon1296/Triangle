@@ -148,10 +148,8 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
 
     for (int i = 0; i < 3; i++) {
         float coeffs[2];
-
         mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
         glm::vec3 b = line.offset - tr.dots[i % 3];
-
         get_lc_coeffs(mat, b, coeffs);
 
         if (coeffs[1] <= 1.0f) {
@@ -217,8 +215,9 @@ void print_vec3(glm::vec3 v) {
 
 // TODO: добавить проверку на несовместность системы
 bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
+    int row = 0;
 
-    for (int col = 0, row = 0; col < int(mat.size()) && row < 3; col++) {
+    for (int col = 0; col < int(mat.size()) && row < 3; col++) {
         int max_row_index = find_max_abs_element_v3(mat[size_t(col)], row);
 
         if (fabsf(mat[size_t(col)][max_row_index]) < 0.001f) {
@@ -230,7 +229,16 @@ bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
             row++;
         }
     }
-
+#if 1
+    // TODO: I know that it is terrible
+    if (row == 0) {
+        if (!fequals(b[1], 0.0f) || !fequals(b[2], 0.0f))
+            return false;
+    } else if (row == 1) {
+        if (!fequals(b[2], 0.0f))
+            return false;
+    }
+#endif
     for (int i = 0, j = 0; i < int(mat.size()) && j < 3; i++) {
         if (fabsf(glm::length(mat[size_t(i)])) < 0.001f) {
             res_coeff[i] = 0.0f;
