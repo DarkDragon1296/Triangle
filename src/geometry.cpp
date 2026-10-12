@@ -8,6 +8,8 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
+static inline bool fequals(float a, float b);
+
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
 #if 0
     if (halfspace_test(tr1, tr2) ||
@@ -122,7 +124,7 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
     glm::vec4 b  = glm::vec4(tr2.dots[0] - tr1.dots[0], 0.0f);
     float coeffs[4];
 
-    get_lc_coeffs(mat, b, coeffs);
+    solve_system(mat, b, coeffs);
 
     line.offset = tr1.dots[0] + coeffs[0] * (tr1.dots[1] - tr1.dots[0])
                               + coeffs[1] * (tr1.dots[2] - tr1.dots[0]);
@@ -144,7 +146,7 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
         float coeffs[2];
         mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
         glm::vec3 b = line.offset - tr.dots[i % 3];
-        get_lc_coeffs(mat, b, coeffs);
+        solve_system(mat, b, coeffs);
 
         if (coeffs[1] <= 1.0f) {
             seg.dots[segment_counter] = coeffs[0];
@@ -209,41 +211,96 @@ void print_vec3(glm::vec3 v) {
 }
 
 // TODO: добавить проверку на несовместность системы
-bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
+bool solve_system(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
+    simplify_system(mat, b);
+    bool is_consistent = is_system_consistent(mat, b);
+
+#if 0
+    if (is_consistent)
+        return false;
+#endif
+
+    get_system_coeffs(mat, b, res_coeff);
+
+    return true;
+}
+
+void simplify_system(std::vector<glm::vec3> &mat, glm::vec3 &b) {
+    size_t col = 0;
     int row = 0;
 
-    for (int col = 0; col < int(mat.size()) && row < 3; col++) {
-        int max_row_index = find_max_abs_element_v3(mat[size_t(col)], row);
+    while (col < mat.size() && row < 3) {
+        int main_row = find_max_abs_element_v3(mat[col], row);
 
-        if (fabsf(mat[size_t(col)][max_row_index]) < 0.001f) {
-            mat[size_t(col)] = glm::vec3(0.0f);
-        } else {
-            swap_rows_mat(mat, row, max_row_index);
-            swap_elem_v3(b, row, max_row_index);
-            simplify_rows_mat(mat, b, row, col);
+        if (!fequals(mat[col][main_row], 0.0f)) {
+            swap_elem_v3(b, row, main_row);
+            swap_rows_mat(mat, row, main_row);
+            simplify_rows_mat(mat, b, row, int(col));
             row++;
-        }
-    }
-#if 1
-    // TODO: I know that it is terrible
-    if (row == 0) {
-        if (!fequals(b[1], 0.0f) || !fequals(b[2], 0.0f))
-            return false;
-    } else if (row == 1) {
-        if (!fequals(b[2], 0.0f))
-            return false;
-    }
-#endif
-    for (int i = 0, j = 0; i < int(mat.size()) && j < 3; i++) {
-        if (fabsf(glm::length(mat[size_t(i)])) < 0.001f) {
-            res_coeff[i] = 0.0f;
+            col++;
         } else {
-            res_coeff[i] = b[j];
-            j++;
+            col++;
         }
+    }
+}
+
+void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
+                       int main_row, int main_col) {
+    for (int row = 0; row < 3; row++) {
+        if (row == main_row || fequals(mat[size_t(main_col)][row], 0.0f))
+            continue;
+
+        float coeff = mat[size_t(main_col)][main_row] /
+                      mat[size_t(main_col)][row];
+
+        mul_mat_row(mat, row, coeff);
+        sub_mat_row(mat, row, main_row);
+        b[row] = coeff * b[row] - b[main_row];
+    }
+
+    float coeff = 1.0f / mat[size_t(main_col)][main_row];
+    mul_mat_row(mat, main_row, coeff);
+    b[main_row] *= coeff;
+}
+
+bool is_system_consistent(std::vector<glm::vec3> mat, glm::vec3 b) {
+    size_t col = 0;
+    int row = 0;
+
+    while (col < mat.size() && row < 3) {
+        if (!fequals(mat[col][row], 0.0f)) {
+            row++;
+            col++;
+        } else {
+            col++;
+        }
+    }
+
+    while (row < 2) {
+        row++;
+        if (!fequals(b[row], 0.0f))
+            return false;
     }
 
     return true;
+}
+
+void get_system_coeffs(std::vector<glm::vec3> mat, glm::vec3 b,
+                       float *res_coeff) {
+    size_t col = 0;
+    int row = 0, i = 0;
+
+    while (col < mat.size() && row < 3) {
+        if (!fequals(mat[col][row], 0.0f)) {
+            res_coeff[int(col)] = b[i];
+            i++;
+            row++;
+            col++;
+        } else {
+            res_coeff[int(col)] = 0.0f;
+            col++;
+        }
+    }
 }
 
 int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
@@ -270,35 +327,14 @@ void swap_elem_v3(glm::vec3 &v3, int i, int j) {
     v3[j] = tmp;
 }
 
-void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
-                       int main_row, int col) {
-    if (fabsf(mat[size_t(col)][main_row]) < 0.001f)
-        return;
+void mul_mat_row(std::vector<glm::vec3> &mat, int row, float coeff) {
+    for (size_t col = 0; col < mat.size(); col++)
+        mat[col][row] *= coeff;
+}
 
-    size_t col_st = size_t(col);
-    float coeff;
-
-    for (int j = 0; j < 3; j++) {
-        if (j == main_row)
-            j++;
-        if (j == 3)
-            break;
-
-        coeff = mat[col_st][j] / mat[col_st][main_row];
-
-        for (size_t i = 0; i < mat.size(); i++) {
-            mat[i][j] -= coeff * mat[i][main_row];
-        }
-
-        b[j] -= coeff * b[main_row];
-    }
-
-    coeff = 1.0f / mat[col_st][main_row];
-
-    for (size_t i = 0; i < mat.size(); i++)
-        mat[i][main_row] *= coeff;;
-
-    b[main_row] *= coeff;
+void sub_mat_row(std::vector<glm::vec3> &mat, int main_row, int row) {
+    for (size_t col = 0; col < mat.size(); col++)
+        mat[col][main_row] -= mat[col][row];
 }
 
 void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b) {

@@ -48,8 +48,11 @@ RenderObjects get_objects(void) {
         {0.0f, 2.0f, -1.0f}
     }};
 
-    generate_triangle_test(objs.triangles);
 #if 0
+    generate_triangle_test(objs.triangles);
+#endif
+
+#if 1
     objs.triangles.push_back(tr1);
     objs.triangles.push_back(tr2);
 #endif

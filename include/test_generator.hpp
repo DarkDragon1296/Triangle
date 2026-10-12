@@ -6,10 +6,10 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 3,
+    TRIANGLES_AMOUNT = 1,
     RADIUS_1 = 5,
-    RADIUS_2 = 5,
-    RADIUS_3 = -3,
+    RADIUS_2 = -5,
+    RADIUS_3 = -6,
     OFFSET_1 = 10,
     OFFSET_2 = 10,
     DEG_ROTATION_1 = 10,

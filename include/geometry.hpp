@@ -55,14 +55,22 @@ Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
 void get_plane(Triangle tr, glm::vec3 &plane_offset,
                glm::vec3 &dir1, glm::vec3 &dir2);
 void sort_segment_points(Segment1D &seg);
+
+bool solve_system        (std::vector<glm::vec3>  mat, glm::vec3 b,
+                          float *res_coeff);
+void simplify_system     (std::vector<glm::vec3> &mat, glm::vec3 &b);
+void simplify_rows_mat   (std::vector<glm::vec3> &mat, glm::vec3 &b,
+                          int main_row, int col);
+bool is_system_consistent(std::vector<glm::vec3>  mat, glm::vec3 b);
+void get_system_coeffs   (std::vector<glm::vec3>  mat, glm::vec3 b,
+                          float *res_coeff);
+void printf_mat          (std::vector<glm::vec3> &mat, glm::vec3 b);
+void swap_rows_mat       (std::vector<glm::vec3> &mat, int i, int j);
+void mul_mat_row         (std::vector<glm::vec3> &mat, int row, float coeff);
+void sub_mat_row         (std::vector<glm::vec3> &mat, int main_row, int row);
+void swap_elem_v3           (glm::vec3 &v3, int i, int j);
+int  find_max_abs_element_v3(glm::vec3  v3, int start_index);
+
 void print_vec3(glm::vec3 v);
-bool get_lc_coeffs(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff);
-int find_max_abs_element_v3(glm::vec3 v3, int start_index);
-void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j);
-void swap_elem_v3(glm::vec3 &v3, int i, int j);
-void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
-                       int main_row, int col);
-static inline bool fequals(float a, float b);
-void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b);
 
 }
