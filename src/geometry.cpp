@@ -8,10 +8,8 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
-static inline bool fequals(float a, float b);
-
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
-#if 1
+#if 0
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
         return;
@@ -65,10 +63,6 @@ bool halfspace_test(Triangle divider, Triangle subject) {
     return true;
 }
 
-static inline bool fequals(float a, float b) {
-    return std::abs(a - b) < 0.001f; //TODO: name the tolerance value
-}
-
 int get_intersection_dim(Triangle tr1, Triangle tr2) {
     glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
     glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
@@ -80,7 +74,7 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
 
     float cross_res = glm::length(glm::cross(n_tr1, n_tr2));
 
-    if (fabsf(cross_res) > 0.001f)
+    if (!fequals(cross_res, 1.0f))
         return 1;
 
     glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
@@ -92,7 +86,7 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
     pl1_offset = glm::normalize(pl1_offset);
     pl2_offset = glm::normalize(pl2_offset);
 
-    if (fabsf(glm::length(pl1_offset - pl2_offset)) > 0.001f)
+    if (!fequals(glm::length(pl1_offset - pl2_offset), 0.0f))
         return 0;
 
     return 2;
@@ -131,12 +125,12 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
     get_lc_coeffs(mat, b, coeffs);
 
     line.offset = tr1.dots[0] + coeffs[0] * (tr1.dots[1] - tr1.dots[0])
-        + coeffs[1] * (tr1.dots[2] - tr1.dots[0]);
+                              + coeffs[1] * (tr1.dots[2] - tr1.dots[0]);
 
     glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
-            tr1.dots[2] - tr1.dots[0]);
+                              tr1.dots[2] - tr1.dots[0]);
     glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
-            tr2.dots[2] - tr2.dots[0]);
+                              tr2.dots[2] - tr2.dots[0]);
 
     line.e = glm::normalize(glm::cross(n1, n2));
 }
@@ -177,6 +171,7 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
     if (seg1.dots[1] < seg2.dots[0] || seg2.dots[1] < seg1.dots[0])
         return false;
 
+    // TODO: std::min and std:max
     seg_res.dots[0] = seg1.dots[0] > seg2.dots[0] ? seg1.dots[0] : seg2.dots[0];
     seg_res.dots[1] = seg1.dots[1] < seg2.dots[1] ? seg1.dots[1] : seg2.dots[1];
 
@@ -258,6 +253,10 @@ int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
             res = i;
     }
     return res;
+}
+
+static inline bool fequals(float a, float b) {
+    return std::abs(a - b) < 0.001f; //TODO: name the tolerance value
 }
 
 void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j) {
