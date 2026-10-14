@@ -18,30 +18,35 @@ const char *fshader_path = "src/shaders/fragment_shader.fs";
 using namespace TOP_LEVEL_NAMESPACE;
 
 int main(void) {
-  GLFWwindow *window = create_window();
-  Shader shader = Shader(vshader_path, fshader_path);
-  RenderObjects objs  = get_objects(); // TODO: (*) combine objs and vobjs
-  VertexObjects vobjs = get_vertex_objects(objs);
-  Camera camera;
+    GLFWwindow *window = create_window();
+    Shader shader = Shader(vshader_path, fshader_path);
+    Timer timer;
+    timer.get_start();
+    RenderObjects objs  = get_objects(); // TODO: (*) combine objs and vobjs
+    timer.get_end();
+    timer.get_delta();
+    std::cout << "Objs time = " << timer.delta << std::endl;
+    VertexObjects vobjs = get_vertex_objects(objs);
+    Camera camera;
 
-  setup_render();
+    setup_render();
 
-  while (!glfwWindowShouldClose(window)) {
-    process_input(window, camera);
-    clear_window();
+    while (!glfwWindowShouldClose(window)) {
+        process_input(window, camera);
+        clear_window();
 
-    process_transforms(shader, camera);
-    draw_objects(objs, vobjs, shader);
+        process_transforms(shader, camera);
+        draw_objects(objs, vobjs, shader);
 
-    glfwSwapBuffers(window);
-    glfwPollEvents();
-  }
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+    }
 
-  terminate_processes(vobjs.triangles);
-  terminate_processes(vobjs.segments);
-  glDeleteProgram(shader.id);
-  glfwDestroyWindow(window);
-  glfwTerminate();
+    terminate_processes(vobjs.triangles);
+    terminate_processes(vobjs.segments);
+    glDeleteProgram(shader.id);
+    glfwDestroyWindow(window);
+    glfwTerminate();
 
-  return 0;
+    return 0;
 }

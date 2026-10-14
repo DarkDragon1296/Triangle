@@ -1,5 +1,6 @@
 #include "geometry.hpp"
 #include "utils.hpp"
+#include "camera.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
@@ -10,13 +11,12 @@ namespace TOP_LEVEL_NAMESPACE {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
+void get_intersection_points(const Triangle &tr1, const Triangle &tr2, RenderObjects &objs) {
 #if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
-        return;
+            return;
 #endif
-
     int dim = get_intersection_dim(tr1, tr2);
 
     if (dim == 1) {
@@ -33,7 +33,7 @@ void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
 /// Returns 'true' if halfspace_test has 
 /// determined that subject is entirely in one 
 /// of the halfspaces created by divider
-bool halfspace_test(Triangle divider, Triangle subject) {
+bool halfspace_test(const Triangle &divider, const Triangle &subject) {
     glm::vec3 a = divider.dots[1] - divider.dots[0];
     glm::vec3 b = divider.dots[2] - divider.dots[0];
     glm::vec3 n = glm::cross(a, b);
@@ -94,7 +94,8 @@ int get_intersection_dim(Triangle tr1, Triangle tr2) {
     return 2;
 }
 
-bool get_3d_segment(Triangle tr1, Triangle tr2, Segment3D &seg_3d) {
+bool get_3d_segment(const Triangle &tr1, const Triangle &tr2,
+                    Segment3D &seg_3d) {
     Segment1D seg1{}, seg2{}, seg_1d_res{};
     Line line{};
     get_line(tr1, tr2, line);
@@ -114,42 +115,47 @@ bool get_3d_segment(Triangle tr1, Triangle tr2, Segment3D &seg_3d) {
 }
 
 void get_line(Triangle tr1, Triangle tr2, Line &line) {
-    std::vector<glm::vec3> mat;
-
-    mat.push_back(tr1.dots[1] - tr1.dots[0]);
-    mat.push_back(tr1.dots[2] - tr1.dots[0]);
-    mat.push_back(tr2.dots[1] - tr2.dots[0]);
-    mat.push_back(tr2.dots[2] - tr2.dots[0]);
-
-    glm::vec4 b  = glm::vec4(tr2.dots[0] - tr1.dots[0], 0.0f);
-    float coeffs[4];
-
-    solve_system(mat, b, coeffs);
-
-    line.offset = tr1.dots[0] + coeffs[0] * (tr1.dots[1] - tr1.dots[0])
-                              + coeffs[1] * (tr1.dots[2] - tr1.dots[0]);
-
-    glm::vec3 n1 = glm::cross(tr1.dots[1] - tr1.dots[0],
-                              tr1.dots[2] - tr1.dots[0]);
-    glm::vec3 n2 = glm::cross(tr2.dots[1] - tr2.dots[0],
-                              tr2.dots[2] - tr2.dots[0]);
+    glm::vec3 n1 = glm::normalize(glm::cross(tr1.dots[1] - tr1.dots[0],
+                                             tr1.dots[2] - tr1.dots[0]));
+    glm::vec3 n2 = glm::normalize(glm::cross(tr2.dots[1] - tr2.dots[0],
+                                             tr2.dots[2] - tr2.dots[0]));
 
     line.e = glm::normalize(glm::cross(n1, n2));
+
+    float det = (float)pow(glm::length(glm::cross(n1, n2)), 2.0f);
+    float d1 = glm::dot(n1, tr1.dots[0]);
+    float d2 = glm::dot(n2, tr2.dots[0]);
+
+    float a = (d1 - d2 * glm::dot(n1, n2)) / det;
+    float b = (d2 - d1 * glm::dot(n1, n2)) / det;
+
+    line.offset = a * n1 + b * n2;
 }
 
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
     int segment_counter = 0;
-    std::vector<glm::vec3> mat;
-    mat.push_back(-line.e);
 
     for (int i = 0; i < 3; i++) {
-        float coeffs[2];
-        mat.push_back(tr.dots[(i + 1) % 3] - tr.dots[i % 3]);
-        glm::vec3 b = line.offset - tr.dots[i % 3];
-        solve_system(mat, b, coeffs);
+        glm::vec3 b = tr.dots[i % 3] - line.offset;
+        glm::vec3 dir = tr.dots[(i + 1) % 3] - tr.dots[i % 3];
+        glm::vec3 v = glm::cross(dir, line.e);
+        float det = glm::dot(v, v);
 
-        if (coeffs[1] <= 1.0f && coeffs[1] >= 0.0f) {
-            seg.dots[segment_counter] = coeffs[0];
+        if (fequals(det, 0.0f)) {
+            std::cout << "Error in segment finding!" << std::endl;
+            return false;
+        }
+
+        float s = -glm::dot(glm::cross(b, line.e), v) / det;
+        float t = -glm::dot(glm::cross(b, dir   ), v) / det;
+
+
+
+        if (!fequals(glm::length(b + s * dir - t * line.e), 0.0f))
+            continue;
+
+        if (s <= 1.0f && s >= 0.0f) {
+            seg.dots[segment_counter] = t;
             segment_counter++;
         }
 
@@ -158,8 +164,6 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
 
         if (segment_counter == 2)
             break;
-
-        mat.pop_back();
     }
 
     if (segment_counter < 2)

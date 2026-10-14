@@ -42,19 +42,19 @@ struct RenderObjects {
   std::vector<glm::vec3> points;
 };
 
-void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs);
-bool halfspace_test(Triangle divider, Triangle subject);
-int get_intersection_dim(Triangle tr1, Triangle tr2);
-bool get_3d_segment(Triangle tr1, Triangle tr2, Segment3D &seg_3d);
-void get_line(Triangle tr1, Triangle tr2, Line &line);
-bool get_1d_segment(Triangle tr, Line line, Segment1D &seg1);
-bool get_1d_intersection_segment(Segment1D seg1,
-                                 Segment1D seg2,
-                                 Segment1D &seg_res);
-Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
-void get_plane(Triangle tr, glm::vec3 &plane_offset,
-               glm::vec3 &dir1, glm::vec3 &dir2);
+void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
+                             RenderObjects &objs);
+int  get_intersection_dim   (Triangle tr1, Triangle tr2);
+bool get_3d_segment   (const Triangle &tr1, const Triangle &tr2,
+                             Segment3D &seg_3d);
+void get_line               (Triangle tr1, Triangle tr2, Line &line);
+void get_plane              (Triangle tr, glm::vec3 &plane_offset,
+                             glm::vec3 &dir1, glm::vec3 &dir2); // TODO: add Plane type
+bool get_1d_segment         (Triangle tr, Line line, Segment1D &seg1);
+bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
+                                 Segment1D &seg_res); // TODO: another name?
 void sort_segment_points(Segment1D &seg);
+Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
 
 bool solve_system        (std::vector<glm::vec3>  mat, glm::vec3 b,
                           float *res_coeff);
@@ -69,8 +69,9 @@ void swap_rows_mat       (std::vector<glm::vec3> &mat, int i, int j);
 void mul_mat_row         (std::vector<glm::vec3> &mat, int row, float coeff);
 void sub_mat_row         (std::vector<glm::vec3> &mat, int main_row, int row);
 void swap_elem_v3           (glm::vec3 &v3, int i, int j);
-int  find_max_abs_element_v3(glm::vec3  v3, int start_index);
+int  find_max_abs_element_v3(glm::vec3  v3, int start_index); // TODO: another name?
+void print_vec3             (glm::vec3 v);
 
-void print_vec3(glm::vec3 v);
+bool halfspace_test(const Triangle &divider, const Triangle &subject);
 
 }
