@@ -11,7 +11,7 @@ namespace TOP_LEVEL_NAMESPACE {
 static inline bool fequals(float a, float b);
 
 void get_intersection_points(Triangle tr1, Triangle tr2, RenderObjects &objs) {
-#if 0
+#if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
         return;
@@ -148,10 +148,13 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
         glm::vec3 b = line.offset - tr.dots[i % 3];
         solve_system(mat, b, coeffs);
 
-        if (coeffs[1] <= 1.0f) {
+        if (coeffs[1] <= 1.0f && coeffs[1] >= 0.0f) {
             seg.dots[segment_counter] = coeffs[0];
             segment_counter++;
         }
+
+        if (segment_counter == 2 && fequals(seg.dots[0], seg.dots[1]))
+            segment_counter--;
 
         if (segment_counter == 2)
             break;
@@ -169,10 +172,8 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
         Segment1D &seg_res) {
     sort_segment_points(seg1);
     sort_segment_points(seg2);
-
     if (seg1.dots[1] < seg2.dots[0] || seg2.dots[1] < seg1.dots[0])
         return false;
-
     // TODO: std::min and std:max
     seg_res.dots[0] = seg1.dots[0] > seg2.dots[0] ? seg1.dots[0] : seg2.dots[0];
     seg_res.dots[1] = seg1.dots[1] < seg2.dots[1] ? seg1.dots[1] : seg2.dots[1];
@@ -210,18 +211,15 @@ void print_vec3(glm::vec3 v) {
     std::cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
 }
 
-// TODO: добавить проверку на несовместность системы
 bool solve_system(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
     simplify_system(mat, b);
     bool is_consistent = is_system_consistent(mat, b);
-
-#if 0
-    if (is_consistent)
+#if 1
+    if (!is_consistent)
         return false;
 #endif
 
     get_system_coeffs(mat, b, res_coeff);
-
     return true;
 }
 
@@ -250,12 +248,13 @@ void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
         if (row == main_row || fequals(mat[size_t(main_col)][row], 0.0f))
             continue;
 
-        float coeff = mat[size_t(main_col)][main_row] /
-                      mat[size_t(main_col)][row];
+        float coeff = mat[size_t(main_col)][row] /
+                      mat[size_t(main_col)][main_row];
 
-        mul_mat_row(mat, row, coeff);
+        mul_mat_row(mat, main_row, coeff);
+        b[main_row] *= coeff;
         sub_mat_row(mat, row, main_row);
-        b[row] = coeff * b[row] - b[main_row];
+        b[row] -= b[main_row];
     }
 
     float coeff = 1.0f / mat[size_t(main_col)][main_row];
@@ -301,6 +300,11 @@ void get_system_coeffs(std::vector<glm::vec3> mat, glm::vec3 b,
             col++;
         }
     }
+
+    while (col < mat.size()) {
+        res_coeff[col] = 0.0f;
+        col++;
+    }
 }
 
 int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
@@ -318,7 +322,7 @@ static inline bool fequals(float a, float b) {
 
 void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j) {
     for (int l = 0; l < int(mat.size()); l++)
-        swap_elem_v3(mat[size_t(i)], i, j);
+        swap_elem_v3(mat[size_t(l)], i, j);
 }
 
 void swap_elem_v3(glm::vec3 &v3, int i, int j) {

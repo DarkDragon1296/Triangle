@@ -16,9 +16,9 @@ class Camera {
 
     float speed{0.1f};
     float yaw  {0.0f};
-    float yaw_speed{0.5f};
+    float yaw_speed{0.7f};
     float pitch{0.0f};
-    float pitch_speed{0.5f};
+    float pitch_speed{0.7f};
 
     glm::vec3 abs_up{0.0f, 1.0f,   0.0f};
     glm::vec3 target{0.0f, 0.0f,   1.0f}; // TODO: del
