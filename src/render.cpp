@@ -33,71 +33,6 @@ GLFWwindow *create_window(void) {
     return window;
 }
 
-RenderObjects get_objects(void) {
-    RenderObjects objs{};
-
-    Triangle tr1 = {{
-        {0.0f, 0.0f, 0.0f},
-        {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 0.0f}
-    }};
-
-    Triangle tr2 = {{
-        {0.0f, 0.0f,  1.0f},
-        {2.0f, 2.0f,  0.0f},
-        {0.0f, 2.0f, -1.0f}
-    }};
-
-#if 1
-    generate_triangle_test(objs.triangles);
-#endif
-
-#if 0
-    objs.triangles.push_back(tr1);
-    objs.triangles.push_back(tr2);
-#endif
-
-    for (size_t i = 0; i < objs.triangles.size(); i++) {
-        for (size_t j = i + 1; j < objs.triangles.size(); j++) {
-            get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
-        }
-    }
-
-    return objs;
-}
-
-VertexObjects get_vertex_objects(const RenderObjects &objs) {
-  VertexObjects vobjs{};
-
-    vobjs.segments = get_buffers(SEGMENT, objs.segments.size()
-                                          * sizeof(Segment3D),
-                                          objs.segments.data());
-
-    vobjs.triangles = get_buffers(TRIANGLE, objs.triangles.size()
-                                           * sizeof(Triangle),
-                                           objs.triangles.data());
-
-  return vobjs;
-}
-
-VertexInfo get_buffers([[maybe_unused]] int dots_amount, // TODO: (*) actually unused
-                       size_t size, const void *data) {
-  VertexInfo vobjs{};
-
-  glGenVertexArrays(1, &vobjs.vao);
-  glBindVertexArray(vobjs.vao);
-
-  glGenBuffers(1, &vobjs.vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
-
-  glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)size, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                        3 * sizeof(float), NULL);
-  glEnableVertexAttribArray(0);
-
-  return vobjs;
-}
-
 void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
                   const Shader &shader) {
     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -115,11 +50,6 @@ void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
 void clear_window(void) {
   glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void terminate_processes(VertexInfo& vobjs) {
-  glDeleteVertexArrays(1, &vobjs.vao);
-  glDeleteBuffers(1, &vobjs.vbo);
 }
 
 void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, 

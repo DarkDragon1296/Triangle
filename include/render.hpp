@@ -14,16 +14,6 @@ enum WindowProperties {
   WIDTH  = 800
 };
 
-struct VertexInfo {
-  uint vbo = 0;
-  uint vao = 0;
-};
-
-struct VertexObjects {
-  VertexInfo triangles;
-  VertexInfo segments;
-};
-
 GLFWwindow *create_window(void);
 RenderObjects get_objects(void);
 VertexObjects get_vertex_objects(const RenderObjects &objs);

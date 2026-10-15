@@ -8,6 +8,8 @@
 #include "shader.hpp"
 #include "render.hpp"
 #include "camera.hpp"
+#include "test_generator.hpp"
+#include "RenderableBatch.hpp"
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -17,16 +19,53 @@ const char *fshader_path = "src/shaders/fragment_shader.fs";
 
 using namespace TOP_LEVEL_NAMESPACE;
 
+void TEST_OBJECTS(std::vector<Triangle> &batch) {
+    Triangle tr1 = {{
+        {0.0f, 0.0f, 0.0f},
+        {2.0f, 2.0f, 0.0f},
+        {0.0f, 2.0f, 0.0f}
+    }};
+
+    Triangle tr2 = {{
+        {0.0f, 0.0f,  1.0f},
+        {2.0f, 2.0f,  0.0f},
+        {0.0f, 2.0f, -1.0f}
+    }};
+
+    #if 1
+    generate_triangle_test(batch);
+    #endif
+
+    #if 0
+    batch.push_back(tr1);
+    batch.triangles.push_back(tr2);
+    #endif
+
+    #if 0
+    for (size_t i = 0; i < objs.triangles.size(); i++) {
+        for (size_t j = i + 1; j < objs.triangles.size(); j++) {
+            get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
+        }
+    }
+    #endif
+}
+
 int main(void) {
     GLFWwindow *window = create_window();
+
     Shader shader = Shader(vshader_path, fshader_path);
+
     Timer timer;
     timer.get_start();
-    RenderObjects objs  = get_objects(); // TODO: (*) combine objs and vobjs
+
+    std::vector<Triangle> batch; // default init
+    TEST_OBJECTS(batch);
+{
+    RenderableBatch<Triangle> triangles{std::move(batch)}; // TODO: (*) combine objs and vobjs (WIP!!!)
+
     timer.get_end();
     timer.get_delta();
     std::cout << "Objs time = " << timer.delta << std::endl;
-    VertexObjects vobjs = get_vertex_objects(objs);
     Camera camera;
 
     setup_render();
@@ -42,8 +81,7 @@ int main(void) {
         glfwPollEvents();
     }
 
-    terminate_processes(vobjs.triangles);
-    terminate_processes(vobjs.segments);
+}
     glDeleteProgram(shader.id);
     glfwDestroyWindow(window);
     glfwTerminate();
