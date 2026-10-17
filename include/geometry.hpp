@@ -56,20 +56,6 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
 void sort_segment_points(Segment1D &seg);
 Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
 
-bool solve_system        (std::vector<glm::vec3>  mat, glm::vec3 b,
-                          float *res_coeff);
-void simplify_system     (std::vector<glm::vec3> &mat, glm::vec3 &b);
-void simplify_rows_mat   (std::vector<glm::vec3> &mat, glm::vec3 &b,
-                          int main_row, int col);
-bool is_system_consistent(std::vector<glm::vec3>  mat, glm::vec3 b);
-void get_system_coeffs   (std::vector<glm::vec3>  mat, glm::vec3 b,
-                          float *res_coeff);
-void printf_mat          (std::vector<glm::vec3> &mat, glm::vec3 b);
-void swap_rows_mat       (std::vector<glm::vec3> &mat, int i, int j);
-void mul_mat_row         (std::vector<glm::vec3> &mat, int row, float coeff);
-void sub_mat_row         (std::vector<glm::vec3> &mat, int main_row, int row);
-void swap_elem_v3           (glm::vec3 &v3, int i, int j);
-int  find_max_abs_element_v3(glm::vec3  v3, int start_index); // TODO: another name?
 void print_vec3             (glm::vec3 v);
 
 bool halfspace_test(const Triangle &divider, const Triangle &subject);

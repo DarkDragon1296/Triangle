@@ -11,12 +11,14 @@ namespace TOP_LEVEL_NAMESPACE {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(const Triangle &tr1, const Triangle &tr2, RenderObjects &objs) {
+void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
+                             RenderObjects &objs) {
 #if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
             return;
 #endif
+
     int dim = get_intersection_dim(tr1, tr2);
 
     if (dim == 1) {
@@ -149,8 +151,6 @@ bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
         float s = -glm::dot(glm::cross(b, line.e), v) / det;
         float t = -glm::dot(glm::cross(b, dir   ), v) / det;
 
-
-
         if (!fequals(glm::length(b + s * dir - t * line.e), 0.0f))
             continue;
 
@@ -215,144 +215,8 @@ void print_vec3(glm::vec3 v) {
     std::cout << "(" << v[0] << ", " << v[1] << ", " << v[2] << ")";
 }
 
-bool solve_system(std::vector<glm::vec3> mat, glm::vec3 b, float *res_coeff) {
-    simplify_system(mat, b);
-    bool is_consistent = is_system_consistent(mat, b);
-#if 1
-    if (!is_consistent)
-        return false;
-#endif
-
-    get_system_coeffs(mat, b, res_coeff);
-    return true;
-}
-
-void simplify_system(std::vector<glm::vec3> &mat, glm::vec3 &b) {
-    size_t col = 0;
-    int row = 0;
-
-    while (col < mat.size() && row < 3) {
-        int main_row = find_max_abs_element_v3(mat[col], row);
-
-        if (!fequals(mat[col][main_row], 0.0f)) {
-            swap_elem_v3(b, row, main_row);
-            swap_rows_mat(mat, row, main_row);
-            simplify_rows_mat(mat, b, row, int(col));
-            row++;
-            col++;
-        } else {
-            col++;
-        }
-    }
-}
-
-void simplify_rows_mat(std::vector<glm::vec3> &mat, glm::vec3 &b,
-                       int main_row, int main_col) {
-    for (int row = 0; row < 3; row++) {
-        if (row == main_row || fequals(mat[size_t(main_col)][row], 0.0f))
-            continue;
-
-        float coeff = mat[size_t(main_col)][row] /
-                      mat[size_t(main_col)][main_row];
-
-        mul_mat_row(mat, main_row, coeff);
-        b[main_row] *= coeff;
-        sub_mat_row(mat, row, main_row);
-        b[row] -= b[main_row];
-    }
-
-    float coeff = 1.0f / mat[size_t(main_col)][main_row];
-    mul_mat_row(mat, main_row, coeff);
-    b[main_row] *= coeff;
-}
-
-bool is_system_consistent(std::vector<glm::vec3> mat, glm::vec3 b) {
-    size_t col = 0;
-    int row = 0;
-
-    while (col < mat.size() && row < 3) {
-        if (!fequals(mat[col][row], 0.0f)) {
-            row++;
-            col++;
-        } else {
-            col++;
-        }
-    }
-
-    while (row < 2) {
-        row++;
-        if (!fequals(b[row], 0.0f))
-            return false;
-    }
-
-    return true;
-}
-
-void get_system_coeffs(std::vector<glm::vec3> mat, glm::vec3 b,
-                       float *res_coeff) {
-    size_t col = 0;
-    int row = 0, i = 0;
-
-    while (col < mat.size() && row < 3) {
-        if (!fequals(mat[col][row], 0.0f)) {
-            res_coeff[int(col)] = b[i];
-            i++;
-            row++;
-            col++;
-        } else {
-            res_coeff[int(col)] = 0.0f;
-            col++;
-        }
-    }
-
-    while (col < mat.size()) {
-        res_coeff[col] = 0.0f;
-        col++;
-    }
-}
-
-int find_max_abs_element_v3(glm::vec3 v3, int start_index) {
-    int res = start_index;
-    for (int i = start_index; i < 3; i++) {
-        if (fabsf(v3[res]) < fabsf(v3[i]))
-            res = i;
-    }
-    return res;
-}
-
 static inline bool fequals(float a, float b) {
     return std::abs(a - b) < 0.001f; //TODO: name the tolerance value
-}
-
-void swap_rows_mat(std::vector<glm::vec3> &mat, int i, int j) {
-    for (int l = 0; l < int(mat.size()); l++)
-        swap_elem_v3(mat[size_t(l)], i, j);
-}
-
-void swap_elem_v3(glm::vec3 &v3, int i, int j) {
-    float tmp = v3[i];
-    v3[i] = v3[j];
-    v3[j] = tmp;
-}
-
-void mul_mat_row(std::vector<glm::vec3> &mat, int row, float coeff) {
-    for (size_t col = 0; col < mat.size(); col++)
-        mat[col][row] *= coeff;
-}
-
-void sub_mat_row(std::vector<glm::vec3> &mat, int main_row, int row) {
-    for (size_t col = 0; col < mat.size(); col++)
-        mat[col][main_row] -= mat[col][row];
-}
-
-void printf_mat(std::vector<glm::vec3> &mat, glm::vec3 b) {
-    for (int j = 0; j < 3; j++) {
-        for (size_t i = 0; i < mat.size(); i++) {
-            std::cout << mat[i][j] << " ";
-        }
-        std::cout << "| " << b[j] << std::endl;
-    }
-    std::cout << std::endl;
 }
 
 }
