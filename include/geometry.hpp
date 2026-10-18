@@ -56,8 +56,12 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
 void sort_segment_points(Segment1D &seg);
 Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
 
-void print_vec3             (glm::vec3 v);
+void print_vec3(glm::vec3 v);
 
 bool halfspace_test(const Triangle &divider, const Triangle &subject);
+void sort_triangles(std::vector<Triangle> &triangle_list);
+int dir_z_sort_cmp(const void *x, const void *y);
+float get_min_z_tr_pos(const Triangle &tr);
+float get_max_z_tr_pos(const Triangle &tr);
 
 }

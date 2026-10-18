@@ -48,6 +48,10 @@ RenderObjects get_objects(void) {
         {0.0f, 2.0f, -1.0f}
     }};
 
+#if 0
+    generate_triangle_field(objs.triangles);
+#endif
+
 #if 1
     generate_triangle_test(objs.triangles);
 #endif
@@ -57,8 +61,16 @@ RenderObjects get_objects(void) {
     objs.triangles.push_back(tr2);
 #endif
 
+    sort_triangles(objs.triangles);
+
     for (size_t i = 0; i < objs.triangles.size(); i++) {
         for (size_t j = i + 1; j < objs.triangles.size(); j++) {
+
+            if (get_max_z_tr_pos(objs.triangles[i]) <
+                get_min_z_tr_pos(objs.triangles[j])) {
+                    break;
+            }
+
             get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
         }
     }

@@ -6,7 +6,7 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 10,
+    TRIANGLES_AMOUNT = 1000,
     RADIUS_1 = 8,
     RADIUS_2 = -10,
     RADIUS_3 = 10,
@@ -16,6 +16,12 @@ enum TriangleTestProperties {
     DEG_ROTATION_2 = 60
 };
 
-void generate_triangle_test(std::vector<Triangle> &triangles);
+enum TriangleFieldPropeties{
+    SIDE = 10,
+    TRIANGLE_LENGTH = 2
+};
+
+void generate_triangle_test (std::vector<Triangle> &triangles);
+void generate_triangle_field(std::vector<Triangle> &triangles);
 
 }

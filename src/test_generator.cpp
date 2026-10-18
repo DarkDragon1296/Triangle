@@ -35,4 +35,27 @@ void generate_triangle_test(std::vector<Triangle> &triangles) {
     }
 }
 
+void generate_triangle_field(std::vector<Triangle> &triangles) {
+    for (int i = 0; i < SIDE; i++) {
+        for (int j = 0; j < SIDE; j++) {
+            Triangle triangle;
+
+            triangle.dots[0][0] = float(i);
+            triangle.dots[0][2] = float(j);
+            triangle.dots[0][1] = 0.0f;
+
+            triangle.dots[1][0] = float(i);
+            triangle.dots[1][2] = float(j);
+            triangle.dots[1][1] = 1.0f;
+
+            triangle.dots[2][0] = float(i + SIDE);
+            triangle.dots[2][2] = float(j);
+            triangle.dots[2][1] = 0.0f;
+
+            triangles.push_back(triangle);
+        }
+    }
+
+}
+
 }

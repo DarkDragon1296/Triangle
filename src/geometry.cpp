@@ -5,6 +5,7 @@
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 #include <cmath>
+#include <algorithm>
 #include <iostream>
 
 namespace TOP_LEVEL_NAMESPACE {
@@ -65,6 +66,35 @@ bool halfspace_test(const Triangle &divider, const Triangle &subject) {
     }
 
     return true;
+}
+
+void sort_triangles(std::vector<Triangle> &triangle_list) {
+    std::qsort(triangle_list.data(), triangle_list.size(),
+               sizeof(Triangle), dir_z_sort_cmp);
+}
+
+int dir_z_sort_cmp(const void *x, const void *y) {
+    const Triangle arg1 = *static_cast<const Triangle *>(x);
+    const Triangle arg2 = *static_cast<const Triangle *>(y);
+
+    float min_z_pos_1 = get_min_z_tr_pos(arg1);
+    float min_z_pos_2 = get_min_z_tr_pos(arg2);
+
+    if (min_z_pos_1 < min_z_pos_2) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
+float get_min_z_tr_pos(const Triangle &tr) {
+    float pos = std::min(std::min(tr.dots[0][2], tr.dots[1][2]), tr.dots[2][2]);
+    return pos;
+}
+
+float get_max_z_tr_pos(const Triangle &tr) {
+    float pos = std::max(std::max(tr.dots[0][2], tr.dots[1][2]), tr.dots[2][2]);
+    return pos;
 }
 
 int get_intersection_dim(Triangle tr1, Triangle tr2) {
