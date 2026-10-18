@@ -20,7 +20,6 @@ class RenderableBatch {
     RenderableBatch(const std::vector<T> &_batch) 
         : batch{_batch} 
     {
-        std::cerr << "DEF VEC CTOR CALLED";
         init_gl_handles();
     }
 
@@ -28,8 +27,6 @@ class RenderableBatch {
     RenderableBatch(std::vector<T> &&_batch) 
         : batch{std::move(_batch)} 
     {
-
-        std::cerr << "MOVE VEC CTOR CALLED";
         init_gl_handles();
     }
 
@@ -37,8 +34,6 @@ class RenderableBatch {
     RenderableBatch(const RenderableBatch &rhs) 
         : batch{rhs.batch} 
     {
-
-        std::cerr << "COPY FROM RENDERB CTOR CALLED";
         init_gl_handles();
     }
 
@@ -48,16 +43,12 @@ class RenderableBatch {
           vbo{rhs.vbo}, 
           vao{rhs.vao}
     {
-
-        std::cerr << "MOVE FROM RENDERB CTOR CALLED";
         rhs.vbo = 0;
         rhs.vao = 0;
     }
 
     // Copy assign
     RenderableBatch &operator=(const RenderableBatch &rhs) {
-
-        std::cerr << "COPY ASSIGN CALLED";
         if (this == &rhs)
             return *this;
 
@@ -73,8 +64,6 @@ class RenderableBatch {
 
     // Move assign
     RenderableBatch &operator=(RenderableBatch &&rhs) {
-
-        std::cerr << "MOVE ASSG CALLED";
         if (this == &rhs)
             return *this;
 
@@ -90,7 +79,6 @@ class RenderableBatch {
 
     // Dtor
     ~RenderableBatch() {
-        std::cerr << "DTOR CALLED";
         delete_gl_handles();
     }
 
@@ -112,7 +100,7 @@ class RenderableBatch {
         glBindVertexArray(vao);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              0, nullptr);
+                              3 * sizeof(float), nullptr);
         glEnableVertexAttribArray(0);
 
         glGenBuffers(1, &vbo);

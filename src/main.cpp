@@ -55,7 +55,6 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
 }
 
 int main(void) {
-    std::cerr << "Hi";
     GLFWwindow *window = create_window();
 
 
