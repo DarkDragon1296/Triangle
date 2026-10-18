@@ -11,7 +11,7 @@ namespace TOP_LEVEL_NAMESPACE {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(const Triangle &tr1, const Triangle &tr2, RenderObjects &objs) {
+void get_intersection_points(const Triangle &tr1, const Triangle &tr2, std::vector<Segment3D> &objs) {
 #if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
@@ -23,7 +23,7 @@ void get_intersection_points(const Triangle &tr1, const Triangle &tr2, RenderObj
         Segment3D segment;
         bool is_exist = get_3d_segment(tr1, tr2, segment);
         if (is_exist)
-            objs.segments.push_back(segment);
+            objs.push_back(segment);
 
     } else if (dim == 2) {
         /* TODO: */

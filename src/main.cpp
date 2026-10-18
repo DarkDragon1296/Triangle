@@ -4,6 +4,7 @@
 // TODO: window size change bag
 // TODO: rename namespace
 
+#include "Renderer.hpp"
 #include "glad.hpp"
 #include "shader.hpp"
 #include "render.hpp"
@@ -19,7 +20,10 @@ const char *fshader_path = "src/shaders/fragment_shader.fs";
 
 using namespace TOP_LEVEL_NAMESPACE;
 
-void TEST_OBJECTS(std::vector<Triangle> &batch) {
+
+void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs);
+
+void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
     Triangle tr1 = {{
         {0.0f, 0.0f, 0.0f},
         {2.0f, 2.0f, 0.0f},
@@ -36,53 +40,60 @@ void TEST_OBJECTS(std::vector<Triangle> &batch) {
     generate_triangle_test(batch);
     #endif
 
-    #if 0
+    #if 1
     batch.push_back(tr1);
-    batch.triangles.push_back(tr2);
+    batch.push_back(tr2);
     #endif
 
-    #if 0
-    for (size_t i = 0; i < objs.triangles.size(); i++) {
-        for (size_t j = i + 1; j < objs.triangles.size(); j++) {
-            get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
+    #if 1
+    for (size_t i = 0; i < batch.size(); i++) {
+        for (size_t j = i + 1; j < batch.size(); j++) {
+            get_intersection_points(batch[i], batch[j], segs);
         }
     }
     #endif
 }
 
 int main(void) {
+    std::cerr << "Hi";
     GLFWwindow *window = create_window();
 
-    Shader shader = Shader(vshader_path, fshader_path);
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glLineWidth(10.0f);
+        glEnable(GL_LINE_SMOOTH);
 
     Timer timer;
     timer.get_start();
 
     std::vector<Triangle> batch; // default init
-    TEST_OBJECTS(batch);
+    std::vector<Segment3D> segs; // default init
+    TEST_OBJECTS(batch, segs);
 {
-    RenderableBatch<Triangle> triangles{std::move(batch)}; // TODO: (*) combine objs and vobjs (WIP!!!)
+    Renderer renderer = {
+        .triangles = {std::move(batch)},
+        .segments  = {std::move(segs)},
+        .camera = {},
+        .shader = {vshader_path, fshader_path},
+    };
 
     timer.get_end();
     timer.get_delta();
     std::cout << "Objs time = " << timer.delta << std::endl;
-    Camera camera;
-
-    setup_render();
 
     while (!glfwWindowShouldClose(window)) {
-        process_input(window, camera);
+        process_input(window, renderer.camera);
         clear_window();
 
-        process_transforms(shader, camera);
-        draw_objects(objs, vobjs, shader);
+        process_transforms(renderer.shader, renderer.camera);
+        renderer.draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
 }
-    glDeleteProgram(shader.id);
     glfwDestroyWindow(window);
     glfwTerminate();
 

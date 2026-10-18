@@ -6,6 +6,12 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
+Shader::~Shader() {
+    std::cerr << "Shader dtor";
+    glDeleteProgram(id);
+}
+
+
 Shader::Shader(const char *vertex_path, const char *fragment_path) {
   std::string vertex_code;
   std::string fragment_code;

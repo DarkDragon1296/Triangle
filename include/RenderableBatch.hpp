@@ -1,10 +1,15 @@
+#pragma once
+
 #include "glad.hpp"
 
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec3.hpp>
+#include <iostream>
 #include <vector>
 
-template <typename T> // Actually not all T's are welcome here
+/// T must be a type that consists ONLY and ONLY of glm::vec3's
+/// Since T will be interpreted as an array of float coordinates in 3D
+template <typename T, GLenum MODE> 
 class RenderableBatch {
     private:
     std::vector<T> batch;
@@ -15,6 +20,7 @@ class RenderableBatch {
     RenderableBatch(const std::vector<T> &_batch) 
         : batch{_batch} 
     {
+        std::cerr << "DEF VEC CTOR CALLED";
         init_gl_handles();
     }
 
@@ -22,6 +28,8 @@ class RenderableBatch {
     RenderableBatch(std::vector<T> &&_batch) 
         : batch{std::move(_batch)} 
     {
+
+        std::cerr << "MOVE VEC CTOR CALLED";
         init_gl_handles();
     }
 
@@ -29,6 +37,8 @@ class RenderableBatch {
     RenderableBatch(const RenderableBatch &rhs) 
         : batch{rhs.batch} 
     {
+
+        std::cerr << "COPY FROM RENDERB CTOR CALLED";
         init_gl_handles();
     }
 
@@ -38,12 +48,16 @@ class RenderableBatch {
           vbo{rhs.vbo}, 
           vao{rhs.vao}
     {
+
+        std::cerr << "MOVE FROM RENDERB CTOR CALLED";
         rhs.vbo = 0;
         rhs.vao = 0;
     }
 
     // Copy assign
     RenderableBatch &operator=(const RenderableBatch &rhs) {
+
+        std::cerr << "COPY ASSIGN CALLED";
         if (this == &rhs)
             return *this;
 
@@ -59,6 +73,8 @@ class RenderableBatch {
 
     // Move assign
     RenderableBatch &operator=(RenderableBatch &&rhs) {
+
+        std::cerr << "MOVE ASSG CALLED";
         if (this == &rhs)
             return *this;
 
@@ -74,11 +90,23 @@ class RenderableBatch {
 
     // Dtor
     ~RenderableBatch() {
+        std::cerr << "DTOR CALLED";
         delete_gl_handles();
+    }
+
+    void draw() const {
+        if (vao == 0 || vbo == 0)
+            return;
+
+        glBindVertexArray(vao);
+        glDrawArrays(MODE, 0, (GLsizei)(batch.size() 
+                                        * (sizeof(T) / sizeof(glm::vec3))));
     }
     
     private:
     void init_gl_handles() {        
+        assert(vao == 0 && vbo == 0);
+
         // Any way to reduce the occurence of magic numbers?
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -92,8 +120,8 @@ class RenderableBatch {
     }
 
     void bind_buffer_data() {
-        if (vbo == 0)
-            return;
+        assert(vbo);
+        assert(batch.data());
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 
@@ -106,4 +134,3 @@ class RenderableBatch {
         glDeleteBuffers(1, &vbo);
     }
 };
-

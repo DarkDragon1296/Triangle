@@ -1,5 +1,6 @@
 #include "glad.hpp"
 #include "render.hpp"
+#include "Renderer.hpp"
 #include "shader.hpp"
 #include "camera.hpp"
 #include "test_generator.hpp"
@@ -33,19 +34,7 @@ GLFWwindow *create_window(void) {
     return window;
 }
 
-void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
-                  const Shader &shader) {
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.0f, 8.0f);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
-    glBindVertexArray(vobjs.segments.vao);
-    glDrawArrays(GL_LINES, 0, 2 * (GLsizei)objs.segments.size());
 
-    glDisable(GL_POLYGON_OFFSET_FILL);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
-    glBindVertexArray(vobjs.triangles.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
-}
 
 void clear_window(void) {
   glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
@@ -57,14 +46,18 @@ void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window,
   glViewport(0, 0, width, height); // TODO: (*) window resize fix
 }
 
-void setup_render(void) {
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-  glLineWidth(10.0f);
-  glEnable(GL_LINE_SMOOTH);
+void Renderer::draw() const {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0f, 8.0f);
+    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
+    segments.draw();
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
+    triangles.draw();
 }
 
-void process_transforms(Shader &shader, Camera cam) {
+void process_transforms(Shader &shader, Camera &cam) {
     shader.use();
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
