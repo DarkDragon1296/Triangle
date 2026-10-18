@@ -1,4 +1,4 @@
-#include "shader.hpp"
+#include "Shader.hpp"
 
 #include <fstream>
 #include <sstream>
@@ -7,10 +7,29 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 Shader::~Shader() {
+    delete_shader();
+}
+
+Shader::Shader(Shader &&rhs) : id{rhs.id} {
+    rhs.id = 0;
+}
+
+Shader &Shader::operator=(Shader &&rhs) {
+    if (this == &rhs)
+        return *this;
+
+    delete_shader();
+    id = rhs.id;
+    rhs.id = 0;
+
+    return *this;
+}
+
+void Shader::delete_shader() {
     glDeleteProgram(id);
 }
 
-
+// TODO: tidy this up
 Shader::Shader(const char *vertex_path, const char *fragment_path) {
   std::string vertex_code;
   std::string fragment_code;

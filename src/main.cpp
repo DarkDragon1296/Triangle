@@ -5,8 +5,8 @@
 // TODO: rename namespace
 
 #include "Renderer.hpp"
+#include "Window.hpp"
 #include "glad.hpp"
-#include "shader.hpp"
 #include "render.hpp"
 #include "camera.hpp"
 #include "test_generator.hpp"
@@ -55,7 +55,23 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
 }
 
 int main(void) {
-    GLFWwindow *window = create_window();
+    if (glfwInit() == GLFW_FALSE) {
+        std::cout << "Failed to inialialize GLFW" << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+
+    std::optional<Window> window = Window::create(WIDTH, HEIGHT, "triangles");
+    if (!window.has_value()) {
+        std::cout << "Failed to initialize window" << std::endl;
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
 
 
     Timer timer;
@@ -76,10 +92,6 @@ int main(void) {
     timer.get_delta();
     std::cout << "Objs time = " << timer.delta << std::endl;
 
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glLineWidth(10.0f);
-        glEnable(GL_LINE_SMOOTH);
 
 
 
@@ -95,8 +107,7 @@ int main(void) {
     }
 
 }
-    glfwDestroyWindow(window);
     glfwTerminate();
 
-    return 0;
+    return EXIT_SUCCESS;
 }

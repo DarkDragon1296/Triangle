@@ -1,8 +1,6 @@
 #pragma once
 
-#include "geometry.hpp"
-#include "shader.hpp"
-#include "types.hpp"
+#include "Shader.hpp"
 #include "camera.hpp"
 
 #include <GLFW/glfw3.h>
@@ -14,7 +12,6 @@ enum WindowProperties {
   WIDTH  = 800
 };
 
-GLFWwindow *create_window(void);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void setup_render(void);
 void process_transforms(Shader &shader, Camera &cam);

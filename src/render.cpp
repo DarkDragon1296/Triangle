@@ -1,8 +1,9 @@
 #include "glad.hpp"
 #include "render.hpp"
 #include "Renderer.hpp"
-#include "shader.hpp"
+#include "Shader.hpp"
 #include "camera.hpp"
+#include "Window.hpp"
 #include "test_generator.hpp"
 
 #include <glm/ext.hpp>
@@ -11,27 +12,52 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
-GLFWwindow *create_window(void) {
-    glfwInit();
+std::optional<Window> Window::create(int width, int height, const char *name) {
+    Window window = Window(width, height, name);
+    return window.handle ? std::optional<Window>{window} : std::nullopt;
+}
+
+Window::Window(int width, int height, const char *name) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "triangles",
-    NULL, NULL);
+    handle = glfwCreateWindow(width, height, name, nullptr, nullptr);
 
-    if (!window) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
+    if (!handle)
+        return;
 
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwMakeContextCurrent(handle);
+    glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        std::cout << "Failed to initialize GLAD" << std::endl;
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glLineWidth(10.0f);
+    glEnable(GL_LINE_SMOOTH);
+}
 
-    return window;
+Window::~Window() {
+    delete_window();
+}
+
+Window::Window(Window &&rhs) : handle{rhs.handle} {
+    rhs.handle = nullptr;
+}
+
+Window &Window::operator=(Window &&rhs) {
+    if (this == &rhs)
+        return *this;
+
+    delete_window();
+    handle = rhs.handle;
+    rhs.handle = nullptr;
+
+    return *this;
+}
+
+void Window::delete_window() {
+    if (handle)
+        glfwDestroyWindow(handle);
 }
 
 
@@ -49,11 +75,11 @@ void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window,
 void Renderer::draw() const {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 8.0f);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
+    glUniform1i(shader.get_uniform_location("isIntersection"), true);
     segments.draw();
 
     glDisable(GL_POLYGON_OFFSET_FILL);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
+    glUniform1i(shader.get_uniform_location("isIntersection"), false);
     triangles.draw();
 }
 
@@ -67,11 +93,12 @@ void process_transforms(Shader &shader, Camera &cam) {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    int model_loc = glGetUniformLocation(shader.id, "model");
-    int view_loc = glGetUniformLocation(shader.id, "view");
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &cam.view[0][0]);
-
-    shader.set_mat4("projection", projection);
+    glUniformMatrix4fv(shader.get_uniform_location("model"), 
+                       1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(shader.get_uniform_location("view"), 
+                       1, GL_FALSE, glm::value_ptr(cam.view));
+    glUniformMatrix4fv(shader.get_uniform_location("projection"), 
+                       1, GL_FALSE, glm::value_ptr(projection));
 }
+
 }

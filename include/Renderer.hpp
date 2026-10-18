@@ -2,13 +2,13 @@
 
 #include "RenderableBatch.hpp"
 #include "camera.hpp"
-#include "shader.hpp"
+#include "Shader.hpp"
 #include "geometry.hpp"
 
 namespace TOP_LEVEL_NAMESPACE {
 
 class Renderer {
-    using TriangleBatch = RenderableBatch<Triangle, GL_TRIANGLES>;
+    using TriangleBatch = RenderableBatch<Triangle,  GL_TRIANGLES>;
     using SegmentBatch  = RenderableBatch<Segment3D, GL_LINES>;
 
     public:

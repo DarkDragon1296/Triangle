@@ -4,7 +4,6 @@
 
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec3.hpp>
-#include <iostream>
 #include <vector>
 
 /// T must be a type that consists ONLY and ONLY of glm::vec3's
