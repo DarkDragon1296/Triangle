@@ -40,7 +40,7 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
     generate_triangle_test(batch);
     #endif
 
-    #if 1
+    #if 0
     batch.push_back(tr1);
     batch.push_back(tr2);
     #endif
@@ -57,11 +57,6 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
 int main(void) {
     GLFWwindow *window = create_window();
 
-
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glLineWidth(10.0f);
-        glEnable(GL_LINE_SMOOTH);
 
     Timer timer;
     timer.get_start();
@@ -80,6 +75,13 @@ int main(void) {
     timer.get_end();
     timer.get_delta();
     std::cout << "Objs time = " << timer.delta << std::endl;
+
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glLineWidth(10.0f);
+        glEnable(GL_LINE_SMOOTH);
+
+
 
     while (!glfwWindowShouldClose(window)) {
         process_input(window, renderer.camera);

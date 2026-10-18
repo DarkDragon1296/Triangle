@@ -7,7 +7,6 @@
 namespace TOP_LEVEL_NAMESPACE {
 
 Shader::~Shader() {
-    std::cerr << "Shader dtor";
     glDeleteProgram(id);
 }
 

@@ -100,7 +100,7 @@ class RenderableBatch {
         glBindVertexArray(vao);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              3 * sizeof(float), nullptr);
+                              3 * sizeof(GL_FLOAT), nullptr);
         glEnableVertexAttribArray(0);
 
         glGenBuffers(1, &vbo);
