@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Window.hpp"
-
 #include <glm/ext.hpp>
-#include <GLFW/glfw3.h>
+
+// TODO: Review this class and Camera.cpp
 
 namespace render {
 
@@ -55,26 +55,6 @@ class Camera {
         right = glm::normalize(glm::cross(dir, abs_up));
         up    = glm::normalize(glm::cross(right, dir));
         view = glm::lookAt(pos, pos + dir, up); 
-    }
-};
-
-class Timer {
-    public:
-
-    double start = 0.0f;
-    double end   = 0.0f;
-    double delta = 0.0f;
-
-    inline void get_start(void) {
-        start = glfwGetTime();
-    }
-
-    inline void get_end(void) {
-        end = glfwGetTime();
-    }
-
-    inline void get_delta(void) {
-        delta = end - start;
     }
 };
 

@@ -5,12 +5,8 @@
 
 #include "Renderer.hpp"
 #include "Window.hpp"
-#include "glad.hpp"
-#include "Camera.hpp"
+#include "Timer.hpp"
 #include "test_generator.hpp"
-#include "RenderableBatch.hpp"
-#include <glm/ext.hpp>
-#include <GLFW/glfw3.h>
 #include <iostream>
 
 const char *vshader_path = "src/shaders/vertex_shader.vs";
@@ -19,6 +15,7 @@ const char *fshader_path = "src/shaders/fragment_shader.fs";
 using namespace render;
 using namespace test_gen;
 using namespace gmt;
+using namespace utils;
 
 int runApp();
 
