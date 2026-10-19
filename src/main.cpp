@@ -17,7 +17,7 @@ using namespace test_gen;
 using namespace gmt;
 using namespace utils;
 
-int runApp();
+int run_app();
 
 int main(void) {
     if (glfwInit() == GLFW_FALSE) {
@@ -25,12 +25,12 @@ int main(void) {
         return EXIT_FAILURE;
     }
 
-    int exit_code = runApp();
+    int exit_code = run_app();
     glfwTerminate();
     return exit_code;
 }
 
-int runApp() {
+int run_app() {
     Timer timer;
     timer.get_start();
 
