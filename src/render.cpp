@@ -1,7 +1,9 @@
 #include "glad.hpp"
 #include "render.hpp"
-#include "shader.hpp"
+#include "Renderer.hpp"
+#include "Shader.hpp"
 #include "camera.hpp"
+#include "Window.hpp"
 #include "test_generator.hpp"
 
 #include <glm/ext.hpp>
@@ -10,128 +12,53 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
-GLFWwindow *create_window(void) {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); 
+std::optional<Window> Window::create(int width, int height, const char *name) {
+    Window window = Window(width, height, name);
+    if (!window.handle) 
+        return std::nullopt;
 
-    GLFWwindow *window = glfwCreateWindow(WIDTH, HEIGHT, "triangles",
-    NULL, NULL);
-
-    if (!window) {
-        std::cout << "Failed to create GLFW window" << std::endl;
-        glfwTerminate();
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-        std::cout << "Failed to initialize GLAD" << std::endl;
+    glfwMakeContextCurrent(window.handle);
+    glfwSetFramebufferSizeCallback(window.handle, framebuffer_size_callback);
 
     return window;
 }
 
-RenderObjects get_objects(void) {
-    RenderObjects objs{};
+Window::Window(int width, int height, const char *name) {
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    Triangle tr1 = {{
-        {0.0f, 0.0f, 0.0f},
-        {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 0.0f}
-    }};
-
-    Triangle tr2 = {{
-        {0.0f, 0.0f,  1.0f},
-        {2.0f, 2.0f,  0.0f},
-        {0.0f, 2.0f, -1.0f}
-    }};
-
-#if 0
-    generate_triangle_field(objs.triangles);
-#endif
-
-#if 1
-    generate_triangle_test(objs.triangles);
-#endif
-
-#if 0
-    objs.triangles.push_back(tr1);
-    objs.triangles.push_back(tr2);
-#endif
-
-    sort_triangles(objs.triangles);
-
-    for (size_t i = 0; i < objs.triangles.size(); i++) {
-        for (size_t j = i + 1; j < objs.triangles.size(); j++) {
-
-            if (get_max_z_tr_pos(objs.triangles[i]) <
-                get_min_z_tr_pos(objs.triangles[j])) {
-                    break;
-            }
-
-            get_intersection_points(objs.triangles[i], objs.triangles[j], objs);
-        }
-    }
-
-    return objs;
+    handle = glfwCreateWindow(width, height, name, nullptr, nullptr);
 }
 
-VertexObjects get_vertex_objects(const RenderObjects &objs) {
-  VertexObjects vobjs{};
-
-    vobjs.segments = get_buffers(SEGMENT, objs.segments.size()
-                                          * sizeof(Segment3D),
-                                          objs.segments.data());
-
-    vobjs.triangles = get_buffers(TRIANGLE, objs.triangles.size()
-                                           * sizeof(Triangle),
-                                           objs.triangles.data());
-
-  return vobjs;
+Window::~Window() {
+    delete_window();
 }
 
-VertexInfo get_buffers([[maybe_unused]] int dots_amount, // TODO: (*) actually unused
-                       size_t size, const void *data) {
-  VertexInfo vobjs{};
-
-  glGenVertexArrays(1, &vobjs.vao);
-  glBindVertexArray(vobjs.vao);
-
-  glGenBuffers(1, &vobjs.vbo);
-  glBindBuffer(GL_ARRAY_BUFFER, vobjs.vbo);
-
-  glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)size, data, GL_STATIC_DRAW);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                        3 * sizeof(float), NULL);
-  glEnableVertexAttribArray(0);
-
-  return vobjs;
+Window::Window(Window &&rhs) noexcept : handle{rhs.handle} {
+    rhs.handle = nullptr;
 }
 
-void draw_objects(const RenderObjects &objs, const VertexObjects &vobjs,
-                  const Shader &shader) {
-    glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(1.0f, 8.0f);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), true);
-    glBindVertexArray(vobjs.segments.vao);
-    glDrawArrays(GL_LINES, 0, 2 * (GLsizei)objs.segments.size());
+Window &Window::operator=(Window &&rhs) noexcept {
+    if (this == &rhs)
+        return *this;
 
-    glDisable(GL_POLYGON_OFFSET_FILL);
-    glUniform1i(glGetUniformLocation(shader.id, "isIntersection"), false);
-    glBindVertexArray(vobjs.triangles.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 3 * (GLsizei)objs.triangles.size());
+    delete_window();
+    handle = rhs.handle;
+    rhs.handle = nullptr;
+
+    return *this;
 }
+
+void Window::delete_window() {
+    if (handle)
+        glfwDestroyWindow(handle);
+}
+
 
 void clear_window(void) {
   glClearColor(0.2f, 0.3f, 0.4f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void terminate_processes(VertexInfo& vobjs) {
-  glDeleteVertexArrays(1, &vobjs.vao);
-  glDeleteBuffers(1, &vobjs.vbo);
 }
 
 void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window, 
@@ -139,14 +66,25 @@ void framebuffer_size_callback([[maybe_unused]] GLFWwindow *window,
   glViewport(0, 0, width, height); // TODO: (*) window resize fix
 }
 
-void setup_render(void) {
-  glEnable(GL_DEPTH_TEST);
-  glDepthFunc(GL_LESS);
-  glLineWidth(10.0f);
-  glEnable(GL_LINE_SMOOTH);
+void Renderer::draw() const {
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.0f, 8.0f);
+    glUniform1i(shader.get_uniform_location("isIntersection"), true);
+    segments.draw();
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
+    glUniform1i(shader.get_uniform_location("isIntersection"), false);
+    triangles.draw();
 }
 
-void process_transforms(Shader &shader, Camera cam) {
+void Renderer::configure_gl_state() const {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glLineWidth(10.0f);
+    glEnable(GL_LINE_SMOOTH);
+}
+
+void process_transforms(Shader &shader, Camera &cam) {
     shader.use();
 
     glm::mat4 projection = glm::perspective(glm::radians(45.0f),
@@ -156,11 +94,12 @@ void process_transforms(Shader &shader, Camera cam) {
     glm::mat4 model = glm::mat4(1.0f);
     model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
-    int model_loc = glGetUniformLocation(shader.id, "model");
-    int view_loc = glGetUniformLocation(shader.id, "view");
-    glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &cam.view[0][0]);
-
-    shader.set_mat4("projection", projection);
+    glUniformMatrix4fv(shader.get_uniform_location("model"), 
+                       1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(shader.get_uniform_location("view"), 
+                       1, GL_FALSE, glm::value_ptr(cam.view));
+    glUniformMatrix4fv(shader.get_uniform_location("projection"), 
+                       1, GL_FALSE, glm::value_ptr(projection));
 }
+
 }

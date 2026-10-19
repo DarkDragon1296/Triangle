@@ -1,6 +1,7 @@
 #pragma once
 
 #include "utils.hpp"
+#include "Window.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
@@ -78,6 +79,6 @@ class Timer {
     }
 };
 
-void process_input(GLFWwindow *window, Camera &cam);
+void process_input(Window &window, Camera &cam);
 
 }

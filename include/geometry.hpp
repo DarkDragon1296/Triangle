@@ -8,12 +8,6 @@
 
 namespace TOP_LEVEL_NAMESPACE {
 
-enum Figures {
-  POINT    = 1,
-  SEGMENT  = 2,
-  TRIANGLE = 3
-};
-
 struct Plane {
   glm::vec3 offset;
   glm::vec3 e[2];
@@ -36,14 +30,8 @@ struct Segment1D {
   float dots[2];
 };
 
-struct RenderObjects {
-  std::vector<Triangle> triangles;
-  std::vector<Segment3D> segments;
-  std::vector<glm::vec3> points;
-};
-
 void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
-                             RenderObjects &objs);
+                             std::vector<Segment3D> &objs);
 int  get_intersection_dim   (Triangle tr1, Triangle tr2);
 bool get_3d_segment   (const Triangle &tr1, const Triangle &tr2,
                              Segment3D &seg_3d);
