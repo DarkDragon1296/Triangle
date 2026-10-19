@@ -54,60 +54,61 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
     #endif
 }
 
+int runApp();
+
 int main(void) {
     if (glfwInit() == GLFW_FALSE) {
         std::cout << "Failed to inialialize GLFW" << std::endl;
         return EXIT_FAILURE;
     }
 
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        glfwTerminate();
-        return EXIT_FAILURE;
-    }
+    int exit_code = runApp();
+    glfwTerminate();
+    return exit_code;
+}
 
-    std::optional<Window> window = Window::create(WIDTH, HEIGHT, "triangles");
-    if (!window.has_value()) {
-        std::cout << "Failed to initialize window" << std::endl;
-        glfwTerminate();
-        return EXIT_FAILURE;
-    }
-
-
+int runApp() {
     Timer timer;
     timer.get_start();
 
     std::vector<Triangle> batch; // default init
     std::vector<Segment3D> segs; // default init
     TEST_OBJECTS(batch, segs);
-{
+
+    std::optional<Window> opt = Window::create(WIDTH, HEIGHT, "triangles");
+    if (!opt.has_value()) {
+        std::cout << "Failed to initialize window" << std::endl;
+        return EXIT_FAILURE;
+    }
+    Window &window = *opt;
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "Failed to initialize GLAD" << std::endl;
+        return EXIT_FAILURE;
+    }
+
     Renderer renderer = {
         .triangles = {std::move(batch)},
         .segments  = {std::move(segs)},
         .camera = {},
         .shader = {vshader_path, fshader_path},
     };
+    renderer.configure_gl_state();
 
     timer.get_end();
     timer.get_delta();
     std::cout << "Objs time = " << timer.delta << std::endl;
 
-
-
-
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window.get())) {
         process_input(window, renderer.camera);
         clear_window();
 
         process_transforms(renderer.shader, renderer.camera);
         renderer.draw();
 
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(window.get());
         glfwPollEvents();
     }
-
-}
-    glfwTerminate();
 
     return EXIT_SUCCESS;
 }

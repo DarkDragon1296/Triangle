@@ -18,6 +18,7 @@ class Renderer {
     Shader shader;
 
     void draw() const; 
+    void configure_gl_state() const;
 };
 
 }

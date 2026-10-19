@@ -14,7 +14,13 @@ namespace TOP_LEVEL_NAMESPACE {
 
 std::optional<Window> Window::create(int width, int height, const char *name) {
     Window window = Window(width, height, name);
-    return window.handle ? std::optional<Window>{window} : std::nullopt;
+    if (!window.handle) 
+        return std::nullopt;
+
+    glfwMakeContextCurrent(window.handle);
+    glfwSetFramebufferSizeCallback(window.handle, framebuffer_size_callback);
+
+    return window;
 }
 
 Window::Window(int width, int height, const char *name) {
@@ -23,28 +29,17 @@ Window::Window(int width, int height, const char *name) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     handle = glfwCreateWindow(width, height, name, nullptr, nullptr);
-
-    if (!handle)
-        return;
-
-    glfwMakeContextCurrent(handle);
-    glfwSetFramebufferSizeCallback(handle, framebuffer_size_callback);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glLineWidth(10.0f);
-    glEnable(GL_LINE_SMOOTH);
 }
 
 Window::~Window() {
     delete_window();
 }
 
-Window::Window(Window &&rhs) : handle{rhs.handle} {
+Window::Window(Window &&rhs) noexcept : handle{rhs.handle} {
     rhs.handle = nullptr;
 }
 
-Window &Window::operator=(Window &&rhs) {
+Window &Window::operator=(Window &&rhs) noexcept {
     if (this == &rhs)
         return *this;
 
@@ -59,7 +54,6 @@ void Window::delete_window() {
     if (handle)
         glfwDestroyWindow(handle);
 }
-
 
 
 void clear_window(void) {
@@ -81,6 +75,13 @@ void Renderer::draw() const {
     glDisable(GL_POLYGON_OFFSET_FILL);
     glUniform1i(shader.get_uniform_location("isIntersection"), false);
     triangles.draw();
+}
+
+void Renderer::configure_gl_state() const {
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+    glLineWidth(10.0f);
+    glEnable(GL_LINE_SMOOTH);
 }
 
 void process_transforms(Shader &shader, Camera &cam) {

@@ -10,12 +10,20 @@ class Window {
     GLFWwindow *handle = nullptr;
 
     public:
+    /// Also calls glfwMakeContextCurrent 
+    /// on the handle if successfully inited 
     static std::optional<Window> create(int width, int height, const char *name);
+
     Window(const Window &rhs) = delete;
     Window &operator=(const Window &rhs) = delete;
-    Window(Window &&rhs);
-    Window &operator=(Window &&rhs); 
+    Window(Window &&rhs) noexcept;
+    Window &operator=(Window &&rhs) noexcept; 
     ~Window(); 
+
+    /// I trust that the programmer will use this function responsibly
+    inline GLFWwindow *get() {
+        return handle;
+    }
 
     private:
     Window(int width, int height, const char *name);
