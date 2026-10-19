@@ -1,12 +1,11 @@
 #pragma once
 
-#include "utils.hpp"
 #include "Window.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace render {
 
 class Camera {
     public:

@@ -1,12 +1,9 @@
 #pragma once
 
 #include "glad.hpp"
-#include "utils.hpp"
+#include <cassert>
 
-#include <glm/fwd.hpp>
-#include <glm/detail/type_mat4x4.hpp>
-
-namespace TOP_LEVEL_NAMESPACE {
+namespace render {
 
 class Shader {
     private:
@@ -16,8 +13,8 @@ class Shader {
     Shader(const char *vertex_path, const char *fragment_path);
     Shader(const Shader &rhs) = delete;
     Shader &operator=(const Shader &rhs) = delete;
-    Shader(Shader &&rhs);
-    Shader &operator=(Shader &&rhs); 
+    Shader(Shader &&rhs) noexcept;
+    Shader &operator=(Shader &&rhs) noexcept; 
     ~Shader(); 
 
     inline void use() const {

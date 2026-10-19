@@ -2,7 +2,40 @@
 #include "geometry.hpp"
 #include <glm/ext.hpp>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace test_gen {
+
+using namespace gmt;
+
+void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
+    [[maybe_unused]] Triangle tr1 = {{
+        {0.0f, 0.0f, 0.0f},
+        {2.0f, 2.0f, 0.0f},
+        {0.0f, 2.0f, 0.0f}
+    }};
+
+    [[maybe_unused]] Triangle tr2 = {{
+        {0.0f, 0.0f,  1.0f},
+        {2.0f, 2.0f,  0.0f},
+        {0.0f, 2.0f, -1.0f}
+    }};
+
+    #if 1
+    generate_triangle_test(batch);
+    #endif
+
+    #if 0
+    batch.push_back(tr1);
+    batch.push_back(tr2);
+    #endif
+
+    #if 1
+    for (size_t i = 0; i < batch.size(); i++) {
+        for (size_t j = i + 1; j < batch.size(); j++) {
+            get_intersection_points(batch[i], batch[j], segs);
+        }
+    }
+    #endif
+}
 
 void generate_triangle_test(std::vector<Triangle> &triangles) {
     float deg_angle[3];

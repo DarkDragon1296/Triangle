@@ -1,12 +1,10 @@
 #pragma once
 
-#include "utils.hpp"
-
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec3.hpp>
 #include <vector>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace gmt {
 
 struct Plane {
   glm::vec3 offset;

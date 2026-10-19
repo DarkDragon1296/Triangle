@@ -3,7 +3,12 @@
 #include <GLFW/glfw3.h>
 #include <optional>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace render {
+
+enum WindowProperties {
+  HEIGHT = 600,
+  WIDTH  = 800
+};
 
 class Window {
     private:

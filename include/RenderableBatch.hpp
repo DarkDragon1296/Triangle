@@ -6,6 +6,8 @@
 #include <glm/detail/type_vec3.hpp>
 #include <vector>
 
+namespace render {
+
 /// T must be a type that consists ONLY and ONLY of glm::vec3's
 /// Since T will be interpreted as an array of float coordinates in 3D
 template <typename T, GLenum MODE> 
@@ -121,3 +123,5 @@ class RenderableBatch {
         glDeleteBuffers(1, &vbo);
     }
 };
+
+}

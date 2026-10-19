@@ -35,28 +35,28 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS 
     "-Wall -Wextra -Weffc++                                    \
-		 -Waggressive-loop-optimizations                           \
-		 -Wc++14-compat -Wmissing-declarations -Wcast-align        \
-		 -Wcast-qual -Wchar-subscripts                             \
-		 -Wconversion -Wctor-dtor-privacy -Wempty-body             \
-		 -Wfloat-equal -Wformat-nonliteral -Wformat-security       \
-	   -Wformat-signedness -Wformat=2 -Winline -Wlogical-op      \
-	   -Wnon-virtual-dtor -Wopenmp-simd -Woverloaded-virtual     \
-	   -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls    \
-		 -Wshadow -Wsign-conversion -Wsign-promo                   \
-		 -Wstrict-null-sentinel -Wstrict-overflow=2                \
-		 -Wsuggest-attribute=noreturn -Wsuggest-final-methods      \
-		 -Wsuggest-final-types -Wsuggest-override -Wswitch-default \
-		 -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code      \
-		 -Wunused -Wuseless-cast -Wvariadic-macros                 \
-		 -Wno-literal-suffix -Wno-missing-field-initializers       \
-		 -Wno-narrowing -Wno-old-style-cast -Wno-varargs           \
-		 -fcheck-new -fsized-deallocation -fstrict-overflow        \
-		 -Wstack-usage=8192 -pie -fPIE -Werror=vla")
+	 -Waggressive-loop-optimizations                           \
+	 -Wc++14-compat -Wmissing-declarations -Wcast-align        \
+	 -Wcast-qual -Wchar-subscripts                             \
+	 -Wconversion -Wctor-dtor-privacy -Wempty-body             \
+	 -Wfloat-equal -Wformat-nonliteral -Wformat-security       \
+	 -Wformat-signedness -Wformat=2 -Winline -Wlogical-op      \
+	 -Wnon-virtual-dtor -Wopenmp-simd -Woverloaded-virtual     \
+	 -Wpacked -Wpointer-arith -Winit-self -Wredundant-decls    \
+	 -Wshadow -Wsign-conversion -Wsign-promo                   \
+	 -Wstrict-null-sentinel -Wstrict-overflow=2                \
+	 -Wsuggest-attribute=noreturn -Wsuggest-final-methods      \
+	 -Wsuggest-final-types -Wsuggest-override -Wswitch-default \
+	 -Wswitch-enum -Wsync-nand -Wundef -Wunreachable-code      \
+	 -Wunused -Wuseless-cast -Wvariadic-macros                 \
+	 -Wno-literal-suffix -Wno-missing-field-initializers       \
+     -Wno-narrowing -Wno-old-style-cast -Wno-varargs           \
+	 -fcheck-new -fsized-deallocation -fstrict-overflow        \
+	 -Wstack-usage=8192 -pie -fPIE -Werror=vla")
 set(CMAKE_CXX_FLAGS_DEBUG
     "-O0 -ggdb                                                     \
      -Wstack-protector -fstack-protector                           \
-		 -fno-omit-frame-pointer                                       \
+	 -fno-omit-frame-pointer                                       \
      -fsanitize=address,alignment,bool,bounds,enum                 \
      -fsanitize=float-cast-overflow,float-divide-by-zero,          \
      -fsanitize=integer-divide-by-zero,leak,nonnull-attribute,     \
@@ -72,9 +72,9 @@ target_sources(
   ${PROJECT_NAME}
 
   PRIVATE
-    src/main.cpp src/render.cpp src/geometry.cpp
-    src/glad.cpp src/shader.cpp src/camera.cpp
-    src/test_generator.cpp
+    src/main.cpp   src/geometry.cpp src/glad.cpp 
+    src/Shader.cpp src/Renderer.cpp src/Window.cpp
+    src/Camera.cpp src/test_generator.cpp
 )
 
 target_link_libraries(

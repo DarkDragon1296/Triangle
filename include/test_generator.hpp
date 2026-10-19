@@ -3,7 +3,7 @@
 #include <vector>
 #include "geometry.hpp"
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace test_gen {
 
 enum TriangleTestProperties {
     TRIANGLES_AMOUNT = 20,
@@ -21,7 +21,9 @@ enum TriangleFieldPropeties{
     TRIANGLE_LENGTH = 2
 };
 
-void generate_triangle_test (std::vector<Triangle> &triangles);
-void generate_triangle_field(std::vector<Triangle> &triangles);
+void TEST_OBJECTS(std::vector<gmt::Triangle> &batch, 
+                  std::vector<gmt::Segment3D> &segs);
+void generate_triangle_test (std::vector<gmt::Triangle> &triangles);
+void generate_triangle_field(std::vector<gmt::Triangle> &triangles);
 
 }

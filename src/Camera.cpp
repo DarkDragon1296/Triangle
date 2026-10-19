@@ -1,8 +1,8 @@
-#include "camera.hpp"
+#include "Camera.hpp"
 
 #include <GLFW/glfw3.h>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace render {
 
 void process_input(Window &window, Camera &cam) {
   if (glfwGetKey(window.get(), GLFW_KEY_ESCAPE) == GLFW_PRESS)

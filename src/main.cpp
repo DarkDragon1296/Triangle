@@ -2,13 +2,11 @@
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
 // TODO: window size change bag
-// TODO: rename namespace
 
 #include "Renderer.hpp"
 #include "Window.hpp"
 #include "glad.hpp"
-#include "render.hpp"
-#include "camera.hpp"
+#include "Camera.hpp"
 #include "test_generator.hpp"
 #include "RenderableBatch.hpp"
 #include <glm/ext.hpp>
@@ -18,41 +16,9 @@
 const char *vshader_path = "src/shaders/vertex_shader.vs";
 const char *fshader_path = "src/shaders/fragment_shader.fs";
 
-using namespace TOP_LEVEL_NAMESPACE;
-
-
-void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs);
-
-void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
-    Triangle tr1 = {{
-        {0.0f, 0.0f, 0.0f},
-        {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 0.0f}
-    }};
-
-    Triangle tr2 = {{
-        {0.0f, 0.0f,  1.0f},
-        {2.0f, 2.0f,  0.0f},
-        {0.0f, 2.0f, -1.0f}
-    }};
-
-    #if 1
-    generate_triangle_test(batch);
-    #endif
-
-    #if 0
-    batch.push_back(tr1);
-    batch.push_back(tr2);
-    #endif
-
-    #if 1
-    for (size_t i = 0; i < batch.size(); i++) {
-        for (size_t j = i + 1; j < batch.size(); j++) {
-            get_intersection_points(batch[i], batch[j], segs);
-        }
-    }
-    #endif
-}
+using namespace render;
+using namespace test_gen;
+using namespace gmt;
 
 int runApp();
 
@@ -88,12 +54,11 @@ int runApp() {
     }
 
     Renderer renderer = {
-        .triangles = {std::move(batch)},
-        .segments  = {std::move(segs)},
-        .camera = {},
-        .shader = {vshader_path, fshader_path},
+        std::move(batch),
+        std::move(segs),
+        Camera{},
+        Shader{vshader_path, fshader_path},
     };
-    renderer.configure_gl_state();
 
     timer.get_end();
     timer.get_delta();
@@ -101,9 +66,8 @@ int runApp() {
 
     while (!glfwWindowShouldClose(window.get())) {
         process_input(window, renderer.camera);
-        clear_window();
 
-        process_transforms(renderer.shader, renderer.camera);
+        renderer.clear();
         renderer.draw();
 
         glfwSwapBuffers(window.get());

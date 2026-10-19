@@ -1,6 +1,4 @@
 #include "geometry.hpp"
-#include "utils.hpp"
-#include "camera.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
@@ -8,7 +6,7 @@
 #include <algorithm>
 #include <iostream>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace gmt {
 
 static inline bool fequals(float a, float b);
 

@@ -4,17 +4,17 @@
 #include <sstream>
 #include <iostream>
 
-namespace TOP_LEVEL_NAMESPACE {
+namespace render {
 
 Shader::~Shader() {
     delete_shader();
 }
 
-Shader::Shader(Shader &&rhs) : id{rhs.id} {
+Shader::Shader(Shader &&rhs) noexcept : id{rhs.id} {
     rhs.id = 0;
 }
 
-Shader &Shader::operator=(Shader &&rhs) {
+Shader &Shader::operator=(Shader &&rhs) noexcept {
     if (this == &rhs)
         return *this;
 
