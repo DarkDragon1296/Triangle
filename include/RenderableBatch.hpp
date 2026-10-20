@@ -110,7 +110,6 @@ class RenderableBatch {
 
     void bind_buffer_data() {
         assert(vbo);
-        assert(batch.data());
 
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, 
