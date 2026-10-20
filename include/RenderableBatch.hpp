@@ -98,14 +98,14 @@ class RenderableBatch {
 
         // Any way to reduce the occurence of magic numbers?
         glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-                              3 * sizeof(GL_FLOAT), nullptr);
-        glEnableVertexAttribArray(0);
+        glBindVertexArray(vao);        
 
         glGenBuffers(1, &vbo);
         bind_buffer_data();
+
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
+                              3 * sizeof(float), nullptr);
+        glEnableVertexAttribArray(0);
     }
 
     void bind_buffer_data() {
