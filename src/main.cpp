@@ -2,6 +2,7 @@
 // TODO: написать README
 // TODO: добавить константность параметров там, где необходимо
 // TODO: window size change bag
+// TODO: 405 elements in spiral test div by zero
 
 #include "Renderer.hpp"
 #include "Window.hpp"

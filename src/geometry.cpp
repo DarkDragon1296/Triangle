@@ -10,7 +10,8 @@ namespace gmt {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(const Triangle &tr1, const Triangle &tr2, std::vector<Segment3D> &objs) {
+void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
+                             std::vector<Segment3D> &objs) {
 #if 1
     if (halfspace_test(tr1, tr2) ||
         halfspace_test(tr2, tr1))
@@ -127,7 +128,10 @@ bool get_3d_segment(const Triangle &tr1, const Triangle &tr2,
                     Segment3D &seg_3d) {
     Segment1D seg1{}, seg2{}, seg_1d_res{};
     Line line{};
-    get_line(tr1, tr2, line);
+    bool is_line_exist = get_line(tr1, tr2, line);
+
+    if (!is_line_exist)
+        return false;
 
     bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
     bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
@@ -143,15 +147,23 @@ bool get_3d_segment(const Triangle &tr1, const Triangle &tr2,
     return true;
 }
 
-void get_line(Triangle tr1, Triangle tr2, Line &line) {
+bool get_line(Triangle tr1, Triangle tr2, Line &line) {
     glm::vec3 n1 = glm::normalize(glm::cross(tr1.dots[1] - tr1.dots[0],
                                              tr1.dots[2] - tr1.dots[0]));
     glm::vec3 n2 = glm::normalize(glm::cross(tr2.dots[1] - tr2.dots[0],
                                              tr2.dots[2] - tr2.dots[0]));
+    glm::vec3 e = glm::cross(n1, n2);
 
-    line.e = glm::normalize(glm::cross(n1, n2));
+    if (fequals(glm::length(e), 0.0f))
+        return false;
+
+    line.e = glm::normalize(e);
 
     float det = (float)pow(glm::length(glm::cross(n1, n2)), 2.0f);
+
+    if (fequals(det, 0.0f))
+        return false;
+
     float d1 = glm::dot(n1, tr1.dots[0]);
     float d2 = glm::dot(n2, tr2.dots[0]);
 
@@ -159,6 +171,8 @@ void get_line(Triangle tr1, Triangle tr2, Line &line) {
     float b = (d2 - d1 * glm::dot(n1, n2)) / det;
 
     line.offset = a * n1 + b * n2;
+
+    return true;
 }
 
 bool get_1d_segment(Triangle tr, Line line, Segment1D &seg) {
@@ -243,7 +257,7 @@ void print_vec3(glm::vec3 v) {
 }
 
 static inline bool fequals(float a, float b) {
-    return std::abs(a - b) < 0.001f; //TODO: name the tolerance value
+    return std::abs(a - b) < 1.0e-6f; //TODO: name the tolerance value
 }
 
 }

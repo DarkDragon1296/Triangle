@@ -33,7 +33,7 @@ void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
 int  get_intersection_dim   (Triangle tr1, Triangle tr2);
 bool get_3d_segment   (const Triangle &tr1, const Triangle &tr2,
                              Segment3D &seg_3d);
-void get_line               (Triangle tr1, Triangle tr2, Line &line);
+bool get_line               (Triangle tr1, Triangle tr2, Line &line);
 void get_plane              (Triangle tr, glm::vec3 &plane_offset,
                              glm::vec3 &dir1, glm::vec3 &dir2); // TODO: add Plane type
 bool get_1d_segment         (Triangle tr, Line line, Segment1D &seg1);

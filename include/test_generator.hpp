@@ -6,7 +6,7 @@
 namespace test_gen {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 20,
+    TRIANGLES_AMOUNT = 1000,
     RADIUS_1 = 8,
     RADIUS_2 = -10,
     RADIUS_3 = 10,
@@ -16,9 +16,9 @@ enum TriangleTestProperties {
     DEG_ROTATION_2 = 60
 };
 
-enum TriangleFieldPropeties{
-    SIDE = 10,
-    TRIANGLE_LENGTH = 2
+enum TriangleSpiralPropeties{
+    SPIRAL_AMOUNT = 1000,
+    ANGLE_STEP = 1
 };
 
 void TEST_OBJECTS(std::vector<gmt::Triangle> &batch, 

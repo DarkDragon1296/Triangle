@@ -19,8 +19,12 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
         {0.0f, 2.0f, -1.0f}
     }};
 
-    #if 1
+    #if 0
     generate_triangle_test(batch);
+    #endif
+
+    #if 1
+    generate_triangle_field(batch);
     #endif
 
     #if 0
@@ -69,24 +73,24 @@ void generate_triangle_test(std::vector<Triangle> &triangles) {
 }
 
 void generate_triangle_field(std::vector<Triangle> &triangles) {
-    for (int i = 0; i < SIDE; i++) {
-        for (int j = 0; j < SIDE; j++) {
+    for (int i = 1; i < SPIRAL_AMOUNT + 1; i++) {
             Triangle triangle;
+            float angle = glm::radians(float(ANGLE_STEP * i));
+            float r = 0.05f * float(i);
 
-            triangle.dots[0][0] = float(i);
-            triangle.dots[0][2] = float(j);
+            triangle.dots[0][0] = 1.2f * r * glm::cos(angle);
+            triangle.dots[0][2] = 1.2f * r * glm::sin(angle);
             triangle.dots[0][1] = 0.0f;
 
-            triangle.dots[1][0] = float(i);
-            triangle.dots[1][2] = float(j);
-            triangle.dots[1][1] = 1.0f;
+            triangle.dots[1][0] = r * glm::cos(angle);
+            triangle.dots[1][2] = r * glm::sin(angle);
+            triangle.dots[1][1] = 0.01f * float(i);
 
-            triangle.dots[2][0] = float(i + SIDE);
-            triangle.dots[2][2] = float(j);
-            triangle.dots[2][1] = 0.0f;
+            triangle.dots[2][0] = 1.3f * r * glm::cos(angle);
+            triangle.dots[2][2] = 1.3f * r * glm::sin(angle);
+            triangle.dots[2][1] = 0.02f * float(i);
 
             triangles.push_back(triangle);
-        }
     }
 
 }
