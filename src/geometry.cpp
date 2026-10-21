@@ -209,15 +209,6 @@ Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d) {
     return seg_3d;
 } 
 
-void get_plane(Triangle tr, glm::vec3 &plane_offset,
-        glm::vec3 &dir1, glm::vec3 &dir2) {
-    plane_offset = tr.dots[0];
-
-    dir1 = glm::normalize(tr.dots[1] - tr.dots[0]);
-    dir2 = tr.dots[1] - tr.dots[0];
-    dir2 = glm::normalize(dir2 - glm::dot(dir2, dir1) * dir1);
-}
-
 void sort_segment_points(Segment1D &seg) {
     if (seg.dots[0] > seg.dots[1]) {
         float tmp = seg.dots[0];

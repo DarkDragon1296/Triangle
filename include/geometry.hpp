@@ -54,8 +54,6 @@ int get_intersection_dim    (const Plane pl1, const Plane pl2);
 bool get_3d_segment         (const TrData &tr_data, const size_t i1,
                              const size_t i2, Segment3D &seg_3d);
 bool get_line               (const Plane &tr1, const Plane &tr2, Line &line);
-void get_plane              (Triangle tr, glm::vec3 &plane_offset,
-                             glm::vec3 &dir1, glm::vec3 &dir2); // TODO: add Plane type
 bool get_1d_segment         (Triangle tr, Line line, Segment1D &seg1);
 bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
                                  Segment1D &seg_res); // TODO: another name?
