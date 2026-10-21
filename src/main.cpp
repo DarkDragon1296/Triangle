@@ -35,7 +35,7 @@ int run_app() {
     Timer timer;
     timer.get_start();
 
-    std::vector<Triangle> batch; // default init
+    gmt::TrData batch; // default init
     std::vector<Segment3D> segs; // default init
     TEST_OBJECTS(batch, segs);
 
@@ -52,7 +52,7 @@ int run_app() {
     }
 
     Renderer renderer = {
-        std::move(batch),
+        std::move(batch.tr),
         std::move(segs),
         Camera{},
         Shader{vshader_path, fshader_path},

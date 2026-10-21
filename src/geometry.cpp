@@ -10,11 +10,12 @@ namespace gmt {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
+void get_intersection_points(const Triangle &tr1, const Plane &pl1, 
+                             const Triangle &tr2, const Plane &pl2,
                              std::vector<Segment3D> &objs) {
 #if 1
-    if (halfspace_test(tr1, tr2) ||
-        halfspace_test(tr2, tr1))
+    if (halfspace_test(pl1, tr2) ||
+        halfspace_test(pl2, tr1))
             return;
 #endif
 
@@ -34,17 +35,22 @@ void get_intersection_points(const Triangle &tr1, const Triangle &tr2,
 /// Returns 'true' if halfspace_test has 
 /// determined that subject is entirely in one 
 /// of the halfspaces created by divider
-bool halfspace_test(const Triangle &divider, const Triangle &subject) {
+bool halfspace_test(const Plane &pl_divider, const Triangle &tr_subject) {
+#if 0
     glm::vec3 a = divider.dots[1] - divider.dots[0];
     glm::vec3 b = divider.dots[2] - divider.dots[0];
     glm::vec3 n = glm::cross(a, b);
 
+    float d = glm::dot(n, divider.dots[0]);
+#endif
+
     bool first_iteration   = true;
     bool in_left_halfspace = false;
-    float d = glm::dot(n, divider.dots[0]);
 
     for (uint i = 0; i < 3; i++) {
-        float plane_equation_res = glm::dot(n, subject.dots[i]) - d;
+        float plane_equation_res = glm::dot(pl_divider.n, tr_subject.dots[i]) -
+                                            pl_divider.offset;
+
         if (fequals(plane_equation_res, 0.0f))
             return false;
 

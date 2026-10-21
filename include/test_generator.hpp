@@ -6,7 +6,7 @@
 namespace test_gen {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 1000,
+    TRIANGLES_AMOUNT = 3000,
     RADIUS_1 = 8,
     RADIUS_2 = -10,
     RADIUS_3 = 10,
@@ -17,12 +17,11 @@ enum TriangleTestProperties {
 };
 
 enum TriangleSpiralPropeties{
-    SPIRAL_AMOUNT = 1000,
+    SPIRAL_AMOUNT = 10000,
     ANGLE_STEP = 1
 };
 
-void TEST_OBJECTS(std::vector<gmt::Triangle> &batch, 
-                  std::vector<gmt::Segment3D> &segs);
+void TEST_OBJECTS(gmt::TrData &batch, std::vector<gmt::Segment3D> &segs);
 void generate_triangle_test (std::vector<gmt::Triangle> &triangles);
 void generate_triangle_field(std::vector<gmt::Triangle> &triangles);
 

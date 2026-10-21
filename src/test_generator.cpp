@@ -6,7 +6,7 @@ namespace test_gen {
 
 using namespace gmt;
 
-void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
+void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     [[maybe_unused]] Triangle tr1 = {{
         {0.0f, 0.0f, 0.0f},
         {2.0f, 2.0f, 0.0f},
@@ -19,12 +19,12 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
         {0.0f, 2.0f, -1.0f}
     }};
 
-    #if 0
-    generate_triangle_test(batch);
+    #if 1
+    generate_triangle_test(batch.tr);
     #endif
 
-    #if 1
-    generate_triangle_field(batch);
+    #if 0
+    generate_triangle_field(batch.tr);
     #endif
 
     #if 0
@@ -32,10 +32,13 @@ void TEST_OBJECTS(std::vector<Triangle> &batch, std::vector<Segment3D> &segs) {
     batch.push_back(tr2);
     #endif
 
+    batch.calc_pl();
+
     #if 1
-    for (size_t i = 0; i < batch.size(); i++) {
-        for (size_t j = i + 1; j < batch.size(); j++) {
-            get_intersection_points(batch[i], batch[j], segs);
+    for (size_t i = 0; i < batch.tr.size(); i++) {
+        for (size_t j = i + 1; j < batch.tr.size(); j++) {
+            get_intersection_points(batch.tr[i], batch.pl[i],
+                                    batch.tr[j], batch.pl[j], segs);
         }
     }
     #endif
