@@ -52,7 +52,7 @@ int run_app() {
     }
 
     Renderer renderer = {
-        std::move(batch.tr),
+        std::move(batch.move_tr()),
         std::move(segs),
         Camera{},
         Shader{vshader_path, fshader_path},

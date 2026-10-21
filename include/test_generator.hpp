@@ -22,7 +22,7 @@ enum TriangleSpiralPropeties{
 };
 
 void TEST_OBJECTS(gmt::TrData &batch, std::vector<gmt::Segment3D> &segs);
-void generate_triangle_test (std::vector<gmt::Triangle> &triangles);
-void generate_triangle_field(std::vector<gmt::Triangle> &triangles);
+void generate_triangle_test (gmt::TrData &tr_data);
+void generate_triangle_field(gmt::TrData &tr_data);
 
 }

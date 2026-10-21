@@ -20,7 +20,7 @@ void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     }};
 
     #if 1
-    generate_triangle_test(batch.tr);
+    generate_triangle_test(batch);
     #endif
 
     #if 0
@@ -32,18 +32,16 @@ void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     batch.push_back(tr2);
     #endif
 
-    batch.calc_pl();
-
     #if 1
-    for (size_t i = 0; i < batch.tr.size(); i++) {
-        for (size_t j = i + 1; j < batch.tr.size(); j++) {
+    for (size_t i = 0; i < batch.get_size(); i++) {
+        for (size_t j = i + 1; j < batch.get_size(); j++) {
             get_intersection_points(batch, i, j, segs);
         }
     }
     #endif
 }
 
-void generate_triangle_test(std::vector<Triangle> &triangles) {
+void generate_triangle_test(gmt::TrData &tr_data) {
     float deg_angle[3];
     float rad_angle[3];
 
@@ -70,11 +68,11 @@ void generate_triangle_test(std::vector<Triangle> &triangles) {
         triangle.dots[2][1] = RADIUS_3 * glm::sin(rad_angle[2]);
         triangle.dots[2][2] = 0.0f;
 
-        triangles.push_back(triangle);
+        tr_data.push_tr(triangle);
     }
 }
 
-void generate_triangle_field(std::vector<Triangle> &triangles) {
+void generate_triangle_field(gmt::TrData &tr_data) {
     for (int i = 1; i < SPIRAL_AMOUNT + 1; i++) {
             Triangle triangle;
             float angle = glm::radians(float(ANGLE_STEP * i));
@@ -92,7 +90,7 @@ void generate_triangle_field(std::vector<Triangle> &triangles) {
             triangle.dots[2][2] = 1.3f * r * glm::sin(angle);
             triangle.dots[2][1] = 0.02f * float(i);
 
-            triangles.push_back(triangle);
+            tr_data.push_tr(triangle);
     }
 
 }

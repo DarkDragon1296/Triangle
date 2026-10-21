@@ -13,11 +13,11 @@ static inline bool fequals(float a, float b);
 void get_intersection_points(const TrData &tr_data, const size_t i1,
                              const size_t i2, std::vector<Segment3D> &objs)
 {
-    if (halfspace_test(tr_data.pl[i1], tr_data.tr[i2]) ||
-        halfspace_test(tr_data.pl[i2], tr_data.tr[i1]))
+    if (halfspace_test(tr_data.get_pl(i1), tr_data.get_tr(i2)) ||
+        halfspace_test(tr_data.get_pl(i2), tr_data.get_tr(i1)))
             return;
 
-    int dim = get_intersection_dim(tr_data.pl[i1], tr_data.pl[i2]);
+    int dim = get_intersection_dim(tr_data.get_pl(i1), tr_data.get_pl(i2));
 
     if (dim == 1) {
         Segment3D segment;
@@ -108,13 +108,13 @@ bool get_3d_segment(const TrData &tr_data, const size_t i1,
 {
     Segment1D seg1{}, seg2{}, seg_1d_res{};
     Line line{};
-    bool is_line_exist = get_line(tr_data.pl[i1], tr_data.pl[i2], line);
+    bool is_line_exist = get_line(tr_data.get_pl(i1), tr_data.get_pl(i2), line);
 
     if (!is_line_exist)
         return false;
 
-    bool is_seg1_exist = get_1d_segment(tr_data.tr[i1], line, seg1);
-    bool is_seg2_exist = get_1d_segment(tr_data.tr[i2], line, seg2);
+    bool is_seg1_exist = get_1d_segment(tr_data.get_tr(i1), line, seg1);
+    bool is_seg2_exist = get_1d_segment(tr_data.get_tr(i2), line, seg2);
 
     if (!is_seg1_exist || !is_seg2_exist)
         return false;
