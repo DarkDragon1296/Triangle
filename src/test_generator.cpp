@@ -37,8 +37,7 @@ void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     #if 1
     for (size_t i = 0; i < batch.tr.size(); i++) {
         for (size_t j = i + 1; j < batch.tr.size(); j++) {
-            get_intersection_points(batch.tr[i], batch.pl[i],
-                                    batch.tr[j], batch.pl[j], segs);
+            get_intersection_points(batch, i, j, segs);
         }
     }
     #endif

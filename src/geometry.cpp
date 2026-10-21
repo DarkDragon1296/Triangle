@@ -10,20 +10,18 @@ namespace gmt {
 
 static inline bool fequals(float a, float b);
 
-void get_intersection_points(const Triangle &tr1, const Plane &pl1, 
-                             const Triangle &tr2, const Plane &pl2,
-                             std::vector<Segment3D> &objs) {
-#if 1
-    if (halfspace_test(pl1, tr2) ||
-        halfspace_test(pl2, tr1))
+void get_intersection_points(const TrData &tr_data, const size_t i1,
+                             const size_t i2, std::vector<Segment3D> &objs)
+{
+    if (halfspace_test(tr_data.pl[i1], tr_data.tr[i2]) ||
+        halfspace_test(tr_data.pl[i2], tr_data.tr[i1]))
             return;
-#endif
 
-    int dim = get_intersection_dim(tr1, tr2);
+    int dim = get_intersection_dim(tr_data.pl[i1], tr_data.pl[i2]);
 
     if (dim == 1) {
         Segment3D segment;
-        bool is_exist = get_3d_segment(tr1, tr2, segment);
+        bool is_exist = get_3d_segment(tr_data, i1, i2, segment);
         if (is_exist)
             objs.push_back(segment);
 
@@ -36,14 +34,6 @@ void get_intersection_points(const Triangle &tr1, const Plane &pl1,
 /// determined that subject is entirely in one 
 /// of the halfspaces created by divider
 bool halfspace_test(const Plane &pl_divider, const Triangle &tr_subject) {
-#if 0
-    glm::vec3 a = divider.dots[1] - divider.dots[0];
-    glm::vec3 b = divider.dots[2] - divider.dots[0];
-    glm::vec3 n = glm::cross(a, b);
-
-    float d = glm::dot(n, divider.dots[0]);
-#endif
-
     bool first_iteration   = true;
     bool in_left_halfspace = false;
 
@@ -101,46 +91,30 @@ float get_max_z_tr_pos(const Triangle &tr) {
     return pos;
 }
 
-int get_intersection_dim(Triangle tr1, Triangle tr2) {
-    glm::vec3 a_tr1 = tr1.dots[2] - tr1.dots[0];
-    glm::vec3 b_tr1 = tr1.dots[2] - tr1.dots[1];
-    glm::vec3 a_tr2 = tr2.dots[2] - tr2.dots[0];
-    glm::vec3 b_tr2 = tr2.dots[2] - tr2.dots[1];
+int get_intersection_dim(const Plane pl1, const Plane pl2) {
+    float cross_value = glm::length(glm::cross(pl1.n, pl2.n));
 
-    glm::vec3 n_tr1 = glm::cross(a_tr1, b_tr1);
-    glm::vec3 n_tr2 = glm::cross(a_tr2, b_tr2);
-
-    float cross_res = glm::length(glm::cross(n_tr1, n_tr2));
-
-    if (!fequals(cross_res, 1.0f))
+    if (!fequals(cross_value, 0.0f))
         return 1;
 
-    glm::vec3 pl1_offset = tr1.dots[0] - glm::dot(tr1.dots[0], a_tr1) * a_tr1
-                                       - glm::dot(tr1.dots[0], b_tr1) * b_tr1;
-
-    glm::vec3 pl2_offset = tr2.dots[0] - glm::dot(tr2.dots[0], a_tr2) * a_tr2
-                                       - glm::dot(tr2.dots[0], b_tr2) * b_tr2;
-
-    pl1_offset = glm::normalize(pl1_offset);
-    pl2_offset = glm::normalize(pl2_offset);
-
-    if (!fequals(glm::length(pl1_offset - pl2_offset), 0.0f))
+    if (!fequals(pl1.offset - pl2.offset, 0.0f))
         return 0;
 
     return 2;
 }
 
-bool get_3d_segment(const Triangle &tr1, const Triangle &tr2,
-                    Segment3D &seg_3d) {
+bool get_3d_segment(const TrData &tr_data, const size_t i1,
+                    const size_t i2, Segment3D &seg_3d)
+{
     Segment1D seg1{}, seg2{}, seg_1d_res{};
     Line line{};
-    bool is_line_exist = get_line(tr1, tr2, line);
+    bool is_line_exist = get_line(tr_data.pl[i1], tr_data.pl[i2], line);
 
     if (!is_line_exist)
         return false;
 
-    bool is_seg1_exist = get_1d_segment(tr1, line, seg1);
-    bool is_seg2_exist = get_1d_segment(tr2, line, seg2);
+    bool is_seg1_exist = get_1d_segment(tr_data.tr[i1], line, seg1);
+    bool is_seg2_exist = get_1d_segment(tr_data.tr[i2], line, seg2);
 
     if (!is_seg1_exist || !is_seg2_exist)
         return false;
@@ -153,30 +127,24 @@ bool get_3d_segment(const Triangle &tr1, const Triangle &tr2,
     return true;
 }
 
-bool get_line(Triangle tr1, Triangle tr2, Line &line) {
-    glm::vec3 n1 = glm::normalize(glm::cross(tr1.dots[1] - tr1.dots[0],
-                                             tr1.dots[2] - tr1.dots[0]));
-    glm::vec3 n2 = glm::normalize(glm::cross(tr2.dots[1] - tr2.dots[0],
-                                             tr2.dots[2] - tr2.dots[0]));
-    glm::vec3 e = glm::cross(n1, n2);
+bool get_line(const Plane &pl1, const Plane &pl2, Line &line) {
+    glm::vec3 e = glm::cross(pl1.n, pl2.n);
+    float len   = glm::length(e);
 
-    if (fequals(glm::length(e), 0.0f))
+    if (fequals(len, 0.0f))
         return false;
 
-    line.e = glm::normalize(e);
-
-    float det = (float)pow(glm::length(glm::cross(n1, n2)), 2.0f);
+    line.e = e / len;
+    float dot_value = glm::dot(pl1.n, pl2.n);
+    float det = float(pow(len, 2.0f));
 
     if (fequals(det, 0.0f))
         return false;
 
-    float d1 = glm::dot(n1, tr1.dots[0]);
-    float d2 = glm::dot(n2, tr2.dots[0]);
+    float a = (pl1.offset - pl2.offset * dot_value) / det;
+    float b = (pl2.offset - pl1.offset * dot_value) / det;
 
-    float a = (d1 - d2 * glm::dot(n1, n2)) / det;
-    float b = (d2 - d1 * glm::dot(n1, n2)) / det;
-
-    line.offset = a * n1 + b * n2;
+    line.offset = a * pl1.n + b * pl2.n;
 
     return true;
 }
