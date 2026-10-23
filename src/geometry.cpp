@@ -62,35 +62,6 @@ bool halfspace_test(const Plane &pl_divider, const Triangle &tr_subject) {
     return true;
 }
 
-void sort_triangles(std::vector<Triangle> &triangle_list) {
-    std::qsort(triangle_list.data(), triangle_list.size(),
-               sizeof(Triangle), dir_z_sort_cmp);
-}
-
-int dir_z_sort_cmp(const void *x, const void *y) {
-    const Triangle arg1 = *static_cast<const Triangle *>(x);
-    const Triangle arg2 = *static_cast<const Triangle *>(y);
-
-    float min_z_pos_1 = get_min_z_tr_pos(arg1);
-    float min_z_pos_2 = get_min_z_tr_pos(arg2);
-
-    if (min_z_pos_1 < min_z_pos_2) {
-        return 1;
-    } else {
-        return -1;
-    }
-}
-
-float get_min_z_tr_pos(const Triangle &tr) {
-    float pos = std::min(std::min(tr.dots[0][2], tr.dots[1][2]), tr.dots[2][2]);
-    return pos;
-}
-
-float get_max_z_tr_pos(const Triangle &tr) {
-    float pos = std::max(std::max(tr.dots[0][2], tr.dots[1][2]), tr.dots[2][2]);
-    return pos;
-}
-
 int get_intersection_dim(const Plane pl1, const Plane pl2) {
     float cross_value = glm::length(glm::cross(pl1.n, pl2.n));
 
@@ -223,6 +194,10 @@ void print_vec3(glm::vec3 v) {
 
 static inline bool fequals(float a, float b) {
     return std::abs(a - b) < 1.0e-6f; //TODO: name the tolerance value
+}
+
+int comp_z(std::pair<size_t, float> &a, std::pair<size_t, float> &b) {
+    return b.second < a.second;
 }
 
 }

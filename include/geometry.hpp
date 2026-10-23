@@ -4,6 +4,8 @@
 #include <glm/fwd.hpp>
 #include <glm/detail/type_vec3.hpp>
 #include <vector>
+#include <algorithm>
+#include <utility>
 
 namespace gmt {
 
@@ -17,8 +19,15 @@ struct Triangle {
 };
 
 struct Plane {
-    glm::vec3 n;
-    float offset;
+    glm::vec3 n{};
+    float offset{};
+
+    Plane(const Triangle &tr) { 
+        glm::vec3 a  = tr.dots[1] - tr.dots[0];
+        glm::vec3 b  = tr.dots[2] - tr.dots[0];
+        n      = glm::normalize(glm::cross(a, b));
+        offset = glm::dot(n, tr.dots[0]);
+    }
 };
 
 struct Segment3D {
@@ -29,38 +38,77 @@ struct Segment1D {
     float dots[2];
 };
 
-class TrData {
-    std::vector<Plane> pl{};
-    std::vector<Triangle> tr{};
+struct Box { // TODO: hide values
+    glm::vec3 dots[2]{};
+
+    Box(const Triangle &tr) {
+        dots[0][0] = std::min({tr.dots[0][0], tr.dots[1][0], tr.dots[2][0]});
+        dots[0][1] = std::min({tr.dots[0][1], tr.dots[1][1], tr.dots[2][1]});
+        dots[0][2] = std::min({tr.dots[0][2], tr.dots[1][2], tr.dots[2][2]});
+        dots[1][0] = std::max({tr.dots[0][0], tr.dots[1][0], tr.dots[2][0]});
+        dots[1][1] = std::max({tr.dots[0][1], tr.dots[1][1], tr.dots[2][1]});
+        dots[1][2] = std::max({tr.dots[0][2], tr.dots[1][2], tr.dots[2][2]});
+    }
+};
+
+int comp_z(std::pair<size_t, float> &a, std::pair<size_t, float> &b); /* TODO: Move that function anywhere */
+
+class SortValue {
+    std::vector<std::pair<size_t, float>> data{};
+
     public:
+
+    void push_value(const float &value) {
+        data.push_back(std::make_pair(data.size(), value));
+    }
+
+    size_t get_index(const size_t &i) const & {
+        return data[i].first;
+    }
+
+    void sort(void) {
+        std::sort(data.begin(), data.end(), comp_z);
+    }
+
+    void clear(void) {
+        data.clear();
+    }
+};
+
+class TrData {
+    std::vector<Plane>    pl{};
+    std::vector<Triangle> tr{};
+
+    public:
+
+    std::vector<Box> bx{};
+    SortValue srt{};
 
     void push_tr(Triangle triangle) {
         tr.push_back(triangle);
-        Plane plane;
-        glm::vec3 a  = triangle.dots[1] - triangle.dots[0];
-        glm::vec3 b  = triangle.dots[2] - triangle.dots[0];
-        plane.n      = glm::normalize(glm::cross(a, b));
-        plane.offset = glm::dot(plane.n, triangle.dots[0]);
-
-        pl.push_back(plane);
+        pl.push_back(Plane{triangle});
+        bx.push_back(Box  {triangle});
+        srt.push_value(bx[bx.size() - 1].dots[0][2]);
     }
 
-    const Triangle &get_tr(size_t i) const {
-        return tr[i];
+    const Triangle &get_tr(size_t i) const & {
+        return tr[srt.get_index(i)];
     }
 
-    const Plane &get_pl(size_t i) const {
-        return pl[i];
+    const Plane &get_pl(size_t i) const & {
+        return pl[srt.get_index(i)];
     }
 
-    std::vector<Triangle> move_tr(void) const {
+    std::vector<Triangle> &&move_tr(void) {
+        pl.clear();
+        bx.clear();
+        srt.clear();
         return std::move(tr);
     }
 
     size_t get_size(void) const {
         return tr.size();
     }
-
 };
 
 void get_intersection_points(const TrData &tr_data, const size_t i1,
@@ -78,9 +126,5 @@ void print_vec3(glm::vec3 v);
 
 void sort_segment_points(Segment1D &seg);
 bool halfspace_test(const Plane &pl_divider, const Triangle &tr_subject);
-void sort_triangles(std::vector<Triangle> &triangle_list);
-int dir_z_sort_cmp(const void *x, const void *y);
-float get_min_z_tr_pos(const Triangle &tr);
-float get_max_z_tr_pos(const Triangle &tr);
 
 }

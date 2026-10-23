@@ -17,7 +17,7 @@ enum TriangleTestProperties {
 };
 
 enum TriangleSpiralPropeties{
-    SPIRAL_AMOUNT = 10000,
+    SPIRAL_AMOUNT = 40000,
     ANGLE_STEP = 1
 };
 
