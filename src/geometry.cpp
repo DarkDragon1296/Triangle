@@ -196,8 +196,9 @@ static inline bool fequals(float a, float b) {
     return std::abs(a - b) < 1.0e-6f; //TODO: name the tolerance value
 }
 
-int comp_z(std::pair<size_t, float> &a, std::pair<size_t, float> &b) {
-    return b.second < a.second;
+int comp_z(const std::pair<size_t, float> &a,
+           const std::pair<size_t, float> &b) {
+    return b.second > a.second;
 }
 
 }

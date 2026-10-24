@@ -51,7 +51,8 @@ struct Box { // TODO: hide values
     }
 };
 
-int comp_z(std::pair<size_t, float> &a, std::pair<size_t, float> &b); /* TODO: Move that function anywhere */
+int comp_z(const std::pair<size_t, float> &a,
+           const std::pair<size_t, float> &b); /* TODO: Move that function anywhere */
 
 class SortValue {
     std::vector<std::pair<size_t, float>> data{};

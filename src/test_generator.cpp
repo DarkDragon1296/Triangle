@@ -33,19 +33,19 @@ void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     batch.push_back(tr2);
     #endif
 
-    #if 1
-
     batch.srt.sort();
 
     for (size_t i = 0; i < batch.get_size(); i++) {
         for (size_t j = i + 1; j < batch.get_size(); j++) {
-            if (batch.bx[i].dots[1][2] < batch.bx[j].dots[0][2])
+            if (batch.bx[batch.srt.get_index(i)].dots[1][2] <
+                batch.bx[batch.srt.get_index(j)].dots[0][2]) {
+                //std::cout << "skip ";
                 break;
+            }
 
             get_intersection_points(batch, i, j, segs);
         }
     }
-    #endif
 }
 
 void generate_triangle_test(gmt::TrData &tr_data) {
