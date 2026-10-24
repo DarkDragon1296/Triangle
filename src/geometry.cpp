@@ -1,4 +1,5 @@
 #include "geometry.hpp"
+#include "Timer.hpp"
 
 #include <glm/ext.hpp>
 #include <GLFW/glfw3.h>
@@ -10,13 +11,69 @@ namespace gmt {
 
 static inline bool fequals(float a, float b);
 
+
+void calculate_intersections(TrData &batch, std::vector<Segment3D> &segs) {
+    size_t sz = batch.get_size();
+
+    size_t cnt1 = 0; // TODO: del
+    size_t cnt2 = 0;
+    size_t cnt3 = 0;
+
+    batch.srt.sort();
+
+    for (size_t i = 0; i < sz; i++) {
+        size_t max_index = find_max_bx_index(batch, i);
+
+        for (size_t j = i + 1; j <= max_index; j++) {
+            size_t i_srt = batch.srt.get_index(i); 
+            size_t j_srt = batch.srt.get_index(j);
+            cnt1++;
+            if (batch.bx[i_srt].dots[1][0] < batch.bx[j_srt].dots[0][1] ||
+                batch.bx[i_srt].dots[1][1] < batch.bx[j_srt].dots[0][1])
+            {
+                continue;
+            }
+            cnt2++;
+            if (halfspace_test(batch.get_pl(i), batch.get_tr(j)) ||
+                halfspace_test(batch.get_pl(j), batch.get_tr(i)))
+            {
+                continue;
+            }
+
+            cnt3++;
+            get_intersection_points(batch, i, j, segs);
+        }
+    }
+
+    std::cout <<   "cnt1 = " << cnt1
+              << ", cnt2 = " << cnt2
+              << ", cnt3 = " << cnt3 << std::endl;
+}
+
+size_t find_max_bx_index(const TrData &tr_data, size_t i) {
+    size_t i_srt = tr_data.srt.get_index(i);
+    size_t sz = tr_data.get_size() - i - 1;
+    size_t max_index = i;
+    size_t divider = 1;
+
+    while (sz / divider != 0) {
+        size_t tmp_index = max_index + sz / divider;
+
+        if (tmp_index < tr_data.get_size() && tr_data.bx[i_srt].dots[1][2] >
+            tr_data.bx[tr_data.srt.get_index(tmp_index)].dots[0][2])
+        { 
+            max_index = tmp_index;
+        }
+
+        divider *= 2;
+    }
+
+    return max_index;
+}
+
 void get_intersection_points(const TrData &tr_data, const size_t i1,
                              const size_t i2, std::vector<Segment3D> &objs)
 {
-    if (halfspace_test(tr_data.get_pl(i1), tr_data.get_tr(i2)) ||
-        halfspace_test(tr_data.get_pl(i2), tr_data.get_tr(i1)))
-            return;
-
     int dim = get_intersection_dim(tr_data.get_pl(i1), tr_data.get_pl(i2));
 
     if (dim == 1) {

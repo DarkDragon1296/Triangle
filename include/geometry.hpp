@@ -112,6 +112,7 @@ class TrData {
     }
 };
 
+void calculate_intersections(TrData &batch, std::vector<Segment3D> &segs);
 void get_intersection_points(const TrData &tr_data, const size_t i1,
                              const size_t i2, std::vector<Segment3D> &objs);
 int  get_intersection_dim   (const Plane pl1, const Plane pl2);
@@ -127,5 +128,6 @@ void print_vec3(glm::vec3 v);
 
 void sort_segment_points(Segment1D &seg);
 bool halfspace_test(const Plane &pl_divider, const Triangle &tr_subject);
+size_t find_max_bx_index(const TrData &tr_data, size_t i);
 
 }

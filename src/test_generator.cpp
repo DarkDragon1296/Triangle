@@ -1,25 +1,12 @@
 #include "test_generator.hpp"
 #include "geometry.hpp"
 #include <glm/ext.hpp>
-#include <iostream>
 
 namespace test_gen {
 
 using namespace gmt;
 
 void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
-    [[maybe_unused]] Triangle tr1 = {{
-        {0.0f, 0.0f, 0.0f},
-        {2.0f, 2.0f, 0.0f},
-        {0.0f, 2.0f, 0.0f}
-    }};
-
-    [[maybe_unused]] Triangle tr2 = {{
-        {0.0f, 0.0f,  1.0f},
-        {2.0f, 2.0f,  0.0f},
-        {0.0f, 2.0f, -1.0f}
-    }};
-
     #if 0
     generate_triangle_test(batch);
     #endif
@@ -28,24 +15,7 @@ void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
     generate_triangle_field(batch);
     #endif
 
-    #if 0
-    batch.push_back(tr1);
-    batch.push_back(tr2);
-    #endif
-
-    batch.srt.sort();
-
-    for (size_t i = 0; i < batch.get_size(); i++) {
-        for (size_t j = i + 1; j < batch.get_size(); j++) {
-            if (batch.bx[batch.srt.get_index(i)].dots[1][2] <
-                batch.bx[batch.srt.get_index(j)].dots[0][2]) {
-                //std::cout << "skip ";
-                break;
-            }
-
-            get_intersection_points(batch, i, j, segs);
-        }
-    }
+    calculate_intersections(batch, segs);
 }
 
 void generate_triangle_test(gmt::TrData &tr_data) {

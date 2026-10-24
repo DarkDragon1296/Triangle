@@ -6,7 +6,7 @@
 namespace test_gen {
 
 enum TriangleTestProperties {
-    TRIANGLES_AMOUNT = 3000,
+    TRIANGLES_AMOUNT = 2000,
     RADIUS_1 = 8,
     RADIUS_2 = -10,
     RADIUS_3 = 10,
@@ -17,7 +17,7 @@ enum TriangleTestProperties {
 };
 
 enum TriangleSpiralPropeties{
-    SPIRAL_AMOUNT = 40000,
+    SPIRAL_AMOUNT = 50000,
     ANGLE_STEP = 1
 };
 
