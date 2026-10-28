@@ -52,6 +52,7 @@ int run_app() {
 
     Renderer renderer = {
         std::move(objs.tr_data.move_tr()),
+        std::move(objs.int_tr),
         std::move(objs.int_seg),
         Camera{},
         Shader{vshader_path, fshader_path},

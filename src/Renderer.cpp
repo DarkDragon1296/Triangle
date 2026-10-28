@@ -2,14 +2,15 @@
 
 namespace render {
 
-Renderer::Renderer(TriangleBatch &&triangles_, SegmentBatch &&segments_,
-                   Camera camera_, Shader &&shader_) 
+Renderer::Renderer(TrBatch &&triangles_, IntTrBatch &&int_tr_, IntSegBatch &&int_seg_,
+         Camera camera_, Shader &&shader_) 
     : triangles{std::move(triangles_)},
-      segments{std::move(segments_)},
+      int_tr{std::move(int_tr_)},
+      int_seg{std::move(int_seg_)},
       camera{camera_},
       shader{std::move(shader_)}
 {
-    configure_gl_state();
+    configure_gl_state  ();
     shader.use();
     init_matrices();
 }
@@ -26,7 +27,8 @@ void Renderer::draw() const {
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.0f, 8.0f);
     glUniform1i(shader.get_uniform_location("isIntersection"), true);
-    segments.draw();
+    int_tr.draw();
+    int_seg.draw();
 
     glDisable(GL_POLYGON_OFFSET_FILL);
     glUniform1i(shader.get_uniform_location("isIntersection"), false);

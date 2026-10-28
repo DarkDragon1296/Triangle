@@ -74,14 +74,26 @@ void get_intersection_points(ObjsData &objs, const size_t i1, const size_t i2) {
             objs.int_seg.push_back(segment);
 
     } else if (dim == 2) {
-#if 0
-        Triangle triangle;
-        bool is_exist = get_int_triangle(Objs.tr_data, i1, i2, triangle);
+#if 1
+        std::vector<Triangle> int_tr;
+        bool is_exist = get_int_triangle(objs.tr_data, i1, i2, int_tr);
 
         if (is_exist)
-            objs.int_tr.push_back(triangle);
+            objs.int_tr.insert(objs.int_tr.end(), int_tr.begin(), int_tr.end());
 #endif
     }
+}
+
+bool get_int_triangle(const TrData &tr_data, const size_t i1, const size_t i2,
+                      std::vector<Triangle> &int_tr)
+{
+    std::vector<glm::vec2> dots{};
+
+    #if 0
+    convert_tr_3d_2d();
+    get_int_tr_dots(tr_data, i1, i2, dots);
+
+    #endif
 }
 
 /// Returns 'true' if halfspace_test has 

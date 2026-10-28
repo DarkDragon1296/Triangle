@@ -8,16 +8,18 @@
 namespace render {
 
 class Renderer {
-    using TriangleBatch = RenderableBatch<gmt::Triangle,  GL_TRIANGLES>;
-    using SegmentBatch  = RenderableBatch<gmt::Segment3D, GL_LINES>;
+    using TrBatch    = RenderableBatch<gmt::Triangle,  GL_TRIANGLES>;
+    using IntTrBatch = RenderableBatch<gmt::Triangle,  GL_TRIANGLES>;
+    using IntSegBatch  = RenderableBatch<gmt::Segment3D, GL_LINES>;
 
     public:
-    TriangleBatch triangles;
-    SegmentBatch  segments;
+    TrBatch triangles;
+    IntTrBatch int_tr;
+    IntSegBatch int_seg;
     Camera camera;
     Shader shader;
 
-    Renderer(TriangleBatch &&triangles_, SegmentBatch &&segments_,
+    Renderer(TrBatch &&triangles_, IntTrBatch &&int_tr_, IntSegBatch &&int_seg_,
              Camera camera_, Shader &&shader_); 
 
     void draw() const; 

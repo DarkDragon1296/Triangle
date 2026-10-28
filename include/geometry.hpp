@@ -129,6 +129,9 @@ bool get_1d_intersection_segment(Segment1D seg1, Segment1D seg2,
                                  Segment1D &seg_res); // TODO: another name?
 Segment3D segment_transform_1d_3d(Line line, Segment1D seg_1d);
 
+bool get_int_triangle(const TrData &tr_data, const size_t i1, const size_t i2,
+                      std::vector<Triangle> &int_tr);
+
 void print_vec3(glm::vec3 v);
 
 void sort_segment_points(Segment1D &seg);
