@@ -6,16 +6,16 @@ namespace test_gen {
 
 using namespace gmt;
 
-void TEST_OBJECTS(gmt::TrData &batch, std::vector<Segment3D> &segs) {
+void TEST_OBJECTS(ObjsData &objs_data) {
     #if 0
-    generate_triangle_test(batch);
+    generate_triangle_test(objs_data.batch);
     #endif
 
     #if 1
-    generate_triangle_field(batch);
+    generate_triangle_field(objs_data.tr_data);
     #endif
 
-    calculate_intersections(batch, segs);
+    calculate_intersections(objs_data);
 }
 
 void generate_triangle_test(gmt::TrData &tr_data) {

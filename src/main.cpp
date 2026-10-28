@@ -35,9 +35,8 @@ int run_app() {
     Timer timer;
     timer.get_start();
 
-    gmt::TrData batch; // default init
-    std::vector<Segment3D> segs; // default init
-    TEST_OBJECTS(batch, segs);
+    ObjsData objs{};
+    TEST_OBJECTS(objs);
 
     std::optional<Window> opt = Window::create(WIDTH, HEIGHT, "triangles");
     if (!opt.has_value()) {
@@ -52,8 +51,8 @@ int run_app() {
     }
 
     Renderer renderer = {
-        std::move(batch.move_tr()),
-        std::move(segs),
+        std::move(objs.tr_data.move_tr()),
+        std::move(objs.int_seg),
         Camera{},
         Shader{vshader_path, fshader_path},
     };

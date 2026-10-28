@@ -17,11 +17,11 @@ enum TriangleTestProperties {
 };
 
 enum TriangleSpiralPropeties{
-    SPIRAL_AMOUNT = 50000,
+    SPIRAL_AMOUNT = 1000,
     ANGLE_STEP = 1
 };
 
-void TEST_OBJECTS(gmt::TrData &batch, std::vector<gmt::Segment3D> &segs);
+void TEST_OBJECTS(gmt::ObjsData &obj_data);
 void generate_triangle_test (gmt::TrData &tr_data);
 void generate_triangle_field(gmt::TrData &tr_data);
 

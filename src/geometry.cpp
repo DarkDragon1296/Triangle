@@ -12,42 +12,36 @@ namespace gmt {
 static inline bool fequals(float a, float b);
 
 
-void calculate_intersections(TrData &batch, std::vector<Segment3D> &segs) {
-    size_t sz = batch.get_size();
+void calculate_intersections(ObjsData &obj) {
+    size_t sz = obj.tr_data.get_size();
 
-    size_t cnt1 = 0; // TODO: del
-    size_t cnt2 = 0;
-    size_t cnt3 = 0;
-
-    batch.srt.sort();
+    obj.tr_data.srt.sort();
 
     for (size_t i = 0; i < sz; i++) {
-        size_t max_index = find_max_bx_index(batch, i);
+        size_t max_index = find_max_bx_index(obj.tr_data, i);
 
         for (size_t j = i + 1; j <= max_index; j++) {
-            size_t i_srt = batch.srt.get_index(i); 
-            size_t j_srt = batch.srt.get_index(j);
-            cnt1++;
-            if (batch.bx[i_srt].dots[1][0] < batch.bx[j_srt].dots[0][1] ||
-                batch.bx[i_srt].dots[1][1] < batch.bx[j_srt].dots[0][1])
-            {
-                continue;
-            }
-            cnt2++;
-            if (halfspace_test(batch.get_pl(i), batch.get_tr(j)) ||
-                halfspace_test(batch.get_pl(j), batch.get_tr(i)))
+            size_t i1 = obj.tr_data.srt.get_index(i); 
+            size_t j1 = obj.tr_data.srt.get_index(j);
+
+            if (obj.tr_data.bx[i1].dots[1][0] < obj.tr_data.bx[j1].dots[0][0] ||
+                obj.tr_data.bx[i1].dots[0][0] > obj.tr_data.bx[j1].dots[1][0] ||
+                obj.tr_data.bx[i1].dots[1][1] < obj.tr_data.bx[j1].dots[0][1] ||
+                obj.tr_data.bx[i1].dots[0][1] > obj.tr_data.bx[j1].dots[1][1])
             {
                 continue;
             }
 
-            cnt3++;
-            get_intersection_points(batch, i, j, segs);
+            if (halfspace_test(obj.tr_data.get_pl(i), obj.tr_data.get_tr(j)) ||
+                halfspace_test(obj.tr_data.get_pl(j), obj.tr_data.get_tr(i)))
+            {
+                continue;
+            }
+
+
+            get_intersection_points(obj.tr_data, i, j, obj.int_seg);
         }
     }
-
-    std::cout <<   "cnt1 = " << cnt1
-              << ", cnt2 = " << cnt2
-              << ", cnt3 = " << cnt3 << std::endl;
 }
 
 size_t find_max_bx_index(const TrData &tr_data, size_t i) {

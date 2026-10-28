@@ -112,7 +112,13 @@ class TrData {
     }
 };
 
-void calculate_intersections(TrData &batch, std::vector<Segment3D> &segs);
+struct ObjsData {
+    TrData tr_data;
+    std::vector<Triangle> int_tr;
+    std::vector<Segment3D> int_seg;
+};
+
+void calculate_intersections(ObjsData &objs);
 void get_intersection_points(const TrData &tr_data, const size_t i1,
                              const size_t i2, std::vector<Segment3D> &objs);
 int  get_intersection_dim   (const Plane pl1, const Plane pl2);
