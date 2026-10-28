@@ -11,7 +11,6 @@ namespace gmt {
 
 static inline bool fequals(float a, float b);
 
-
 void calculate_intersections(ObjsData &obj) {
     size_t sz = obj.tr_data.get_size();
 
@@ -38,8 +37,7 @@ void calculate_intersections(ObjsData &obj) {
                 continue;
             }
 
-
-            get_intersection_points(obj.tr_data, i, j, obj.int_seg);
+            get_intersection_points(obj, i, j);
         }
     }
 }
@@ -65,19 +63,24 @@ size_t find_max_bx_index(const TrData &tr_data, size_t i) {
     return max_index;
 }
 
-void get_intersection_points(const TrData &tr_data, const size_t i1,
-                             const size_t i2, std::vector<Segment3D> &objs)
-{
-    int dim = get_intersection_dim(tr_data.get_pl(i1), tr_data.get_pl(i2));
-
+void get_intersection_points(ObjsData &objs, const size_t i1, const size_t i2) {
+    int dim = get_intersection_dim(objs.tr_data.get_pl(i1),
+                                   objs.tr_data.get_pl(i2));
     if (dim == 1) {
         Segment3D segment;
-        bool is_exist = get_3d_segment(tr_data, i1, i2, segment);
+        bool is_exist = get_3d_segment(objs.tr_data, i1, i2, segment);
+
         if (is_exist)
-            objs.push_back(segment);
+            objs.int_seg.push_back(segment);
 
     } else if (dim == 2) {
-        /* TODO: */
+#if 0
+        Triangle triangle;
+        bool is_exist = get_int_triangle(Objs.tr_data, i1, i2, triangle);
+
+        if (is_exist)
+            objs.int_tr.push_back(triangle);
+#endif
     }
 }
 

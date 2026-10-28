@@ -119,8 +119,7 @@ struct ObjsData {
 };
 
 void calculate_intersections(ObjsData &objs);
-void get_intersection_points(const TrData &tr_data, const size_t i1,
-                             const size_t i2, std::vector<Segment3D> &objs);
+void get_intersection_points(ObjsData &objs, const size_t i1, const size_t i2);
 int  get_intersection_dim   (const Plane pl1, const Plane pl2);
 bool get_3d_segment         (const TrData &tr_data, const size_t i1,
                              const size_t i2, Segment3D &seg_3d);
